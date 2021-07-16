@@ -1,0 +1,4 @@
+/vendor/
+/.phpunit.cache/
+/.infection/
+/.php-cs-fixer.cache
