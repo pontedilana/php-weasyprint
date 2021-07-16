@@ -1,0 +1,40 @@
+{
+    "name": "pontedilana/php-weasyprint",
+    "description": "PHP library allowing PDF generation from an url or a html page. Wrapper for Kozea/WeasyPrint.",
+    "type": "library",
+    "keywords": ["weasyprint", "pdf", "php"],
+    "require": {
+        "php": "^7.4||^8.0",
+        "psr/log": "^1.1",
+        "symfony/process": "^4.4||^5.3"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^0.12",
+        "phpstan/phpstan-phpunit": "^0.12"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Pontedilana\\PhpWeasyPrint\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Unit\\Pontedilana\\PhpWeasyPrint\\": "tests/Unit/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pontedilana Dev Team",
+            "homepage": "https://www.pontedilana.it"
+        }
+    ],
+    "scripts": {
+        "unit-tests": "vendor/bin/phpunit",
+        "static-analysis": "vendor/bin/phpstan analyse --ansi",
+        "check-cs": "vendor/bin/php-cs-fixer fix --diff --dry-run --verbose",
+        "fix-cs": "vendor/bin/php-cs-fixer fix --verbose"
+    }
+}
