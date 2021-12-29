@@ -65,7 +65,7 @@ class PdfTest extends TestCase
         $testObject->setTemporaryFolder(__DIR__);
 
         $testObject->getOutputFromHtml('<html></html>', ['stylesheet' => 'html {font-size: 16px;}']);
-        $this->assertMatchesRegularExpression('/emptyBinary --format pdf --stylesheet ' . $q . '.*' . $q . ' ' . $q . '.*' . $q . ' ' . $q . '.*' . $q . '/', $testObject->getLastCommand());
+        $this->assertMatchesRegularExpression('/emptyBinary --stylesheet ' . $q . '.*' . $q . ' ' . $q . '.*' . $q . ' ' . $q . '.*' . $q . '/', $testObject->getLastCommand());
     }
 
     /**
@@ -116,27 +116,27 @@ class PdfTest extends TestCase
             // no options
             'no options' => [
                 [],
-                '/emptyBinary --format pdf ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                '/emptyBinary ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
             // just pass a single stylesheet URL
             'just pass a single stylesheet URL' => [
                 ['stylesheet' => 'https://google.com'],
-                '/emptyBinary --format pdf --stylesheet ' . $q . 'https:\/\/google\.com' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                '/emptyBinary --stylesheet ' . $q . 'https:\/\/google\.com' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
             // just pass the given footer file
             'just pass a single stylesheet file' => [
                 ['stylesheet' => __FILE__],
-                '/emptyBinary --format pdf --stylesheet ' . $q . \preg_quote(__FILE__, '/') . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                '/emptyBinary --stylesheet ' . $q . \preg_quote(__FILE__, '/') . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
             // save the given stylesheet CSS string into a temporary file and pass that filename
             'save the given stylesheet CSS string into a temporary file and pass that filename' => [
                 ['stylesheet' => 'html {font-size: 16px;}'],
-                '/emptyBinary --format pdf --stylesheet ' . $q . '.*\.css' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                '/emptyBinary --stylesheet ' . $q . '.*\.css' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
             // save the content of the given attachment URL to a file and pass that filename
             'save the content of the given attachment URL to a file and pass that filename' => [
                 ['attachment' => 'https://www.google.com/favicon.ico'],
-                '/emptyBinary --format pdf --attachment ' . $q . '.*' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                '/emptyBinary --attachment ' . $q . '.*' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
         ];
     }

@@ -69,16 +69,17 @@ class Pdf extends AbstractGenerator
     {
         $this->addOptions([
             // Global options
-            'format' => 'pdf', // forced to 'pdf', should not be override
             'encoding' => null,
             'stylesheet' => [], //repeatable
             'media-type' => null,
-            'resolution' => null, //png only
             'base-url' => null,
             'attachment' => [], //repeatable
             'presentational-hints' => null,
+            'optimize-size' => null, // added in 53.0b2
+            // Deprecated
+            'format' => null, // deprecated in 53.0b2
             'optimize-images' => null, // deprecated in 53.0b2
-            'optimize-size' => null, //from 53.0b2
+            'resolution' => null, // deprecated - png only
         ]);
     }
 
