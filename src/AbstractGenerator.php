@@ -202,7 +202,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Prepares the specified output.
      *
      * @param string $filename  The output filename
-     * @param bool   $overwrite Whether to overwrite the file if it already exist
+     * @param bool   $overwrite Whether to overwrite the file if it already exists
      *
      * @throws FileAlreadyExistsException
      * @throws \RuntimeException

@@ -6,7 +6,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\AbstractGenerator;
 use Psr\Log\LoggerInterface;
-use ReflectionException;
 use ReflectionMethod;
 use ReflectionProperty;
 use RuntimeException;
@@ -41,15 +40,21 @@ class AbstractGeneratorTest extends TestCase
             $media->getOptions(),
             '->addOption() appends the option to the existing ones'
         );
+    }
 
-        $message = '->addOption() raises an exception when the specified option already exists';
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::addOption
+     */
+    public function testAddOptionException(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
-        try {
-            $r->invokeArgs($media, ['baz', 'bat']);
-            $this->fail($message);
-        } catch (ReflectionException $e) {
-            $this->anything();
-        }
+        $r = new ReflectionMethod($media, 'addOption');
+        $r->setAccessible(true);
+        $r->invokeArgs($media, ['foo', 'bar']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $r->invokeArgs($media, ['foo', 'baz']);
     }
 
     /**
@@ -86,15 +91,21 @@ class AbstractGeneratorTest extends TestCase
             $media->getOptions(),
             '->addOptions() adds the given options to the existing ones'
         );
+    }
 
-        $message = '->addOptions() raises an exception when one of the given options already exists';
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::addOptions
+     */
+    public function testAddOptionsException(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
-        try {
-            $r->invokeArgs($media, [['bak' => 'bam', 'bah' => 'bap', 'baz' => 'bat']]);
-            $this->fail($message);
-        } catch (ReflectionException $e) {
-            $this->anything();
-        }
+        $r = new ReflectionMethod($media, 'addOptions');
+        $r->setAccessible(true);
+        $r->invokeArgs($media, [['foo' => 'bar', 'baz' => 'bat']]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $r->invokeArgs($media, [['foo' => 'baz']]);
     }
 
     /**
@@ -188,7 +199,7 @@ class AbstractGeneratorTest extends TestCase
     public function testGenerate(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'prepareOutput',
                 'getCommand',
@@ -264,7 +275,7 @@ class AbstractGeneratorTest extends TestCase
     public function testFailingGenerate(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'prepareOutput',
                 'getCommand',
@@ -336,7 +347,7 @@ class AbstractGeneratorTest extends TestCase
     public function testGenerateFromHtml(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'generate',
                 'createTemporaryFile',
@@ -374,7 +385,7 @@ class AbstractGeneratorTest extends TestCase
     public function testGetOutput(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'getDefaultExtension',
                 'createTemporaryFile',
@@ -430,7 +441,7 @@ class AbstractGeneratorTest extends TestCase
     public function testGetOutputFromHtml(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'getOutput',
                 'createTemporaryFile',
@@ -503,15 +514,25 @@ class AbstractGeneratorTest extends TestCase
             $mergedOptions,
             '->mergeOptions() merges many options to the instance ones and returns the result options array'
         );
+    }
 
-        $message = '->mergeOptions() throws an InvalidArgumentException once there is an undefined option in the given array';
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::mergeOptions
+     */
+    public function testMergeOptionsException(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+        $originalOptions = ['foo' => 'bar', 'baz' => 'bat'];
 
-        try {
-            $r->invokeArgs($media, [['foo' => 'ban', 'bad' => 'bah']]);
-            $this->fail($message);
-        } catch (ReflectionException $e) {
-            $this->anything();
-        }
+        $addOptions = new ReflectionMethod($media, 'addOptions');
+        $addOptions->setAccessible(true);
+        $addOptions->invokeArgs($media, [$originalOptions]);
+
+        $r = new ReflectionMethod($media, 'mergeOptions');
+        $r->setAccessible(true);
+
+        $this->expectException(InvalidArgumentException::class);
+        $mergedOptions = $r->invokeArgs($media, [['bad' => 'ban']]);
     }
 
     /**
@@ -588,7 +609,7 @@ class AbstractGeneratorTest extends TestCase
     public function testCheckOutput(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'fileExists',
                 'filesize',
@@ -628,7 +649,7 @@ class AbstractGeneratorTest extends TestCase
     public function testCheckOutputWhenTheFileDoesNotExist(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'fileExists',
                 'filesize',
@@ -662,7 +683,7 @@ class AbstractGeneratorTest extends TestCase
     public function testCheckOutputWhenTheFileIsEmpty(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'fileExists',
                 'filesize',
@@ -703,7 +724,7 @@ class AbstractGeneratorTest extends TestCase
     public function testCheckProcessStatus(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods(['configure'])
+            ->onlyMethods(['configure'])
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -737,7 +758,7 @@ class AbstractGeneratorTest extends TestCase
     {
         $this->expectException(\Pontedilana\PhpWeasyPrint\Exception\FileAlreadyExistsException::class);
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'fileExists',
                 'isFile',
@@ -768,7 +789,7 @@ class AbstractGeneratorTest extends TestCase
     public function testCleanupEmptyTemporaryFiles(): void
     {
         $generator = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'unlink',
             ])
@@ -800,7 +821,7 @@ class AbstractGeneratorTest extends TestCase
     public function testCleanupTemporaryFiles(): void
     {
         $generator = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'unlink',
             ])
