@@ -3,7 +3,7 @@
 namespace Pontedilana\PhpWeasyPrint;
 
 /**
- * Use this class to transform a html/a url to a pdf.
+ * Use this class to transform a html/an url to a pdf.
  *
  * @author  Manuel Dalla Lana <manuel@pontedilana.it>
  */

@@ -5,7 +5,7 @@ namespace Pontedilana\PhpWeasyPrint;
 use Pontedilana\PhpWeasyPrint\Exception\UnsupportedWeasyPrintVersionException;
 
 /**
- * Use this class to create a snapshot / thumbnail from a HTML page.
+ * Use this class to create a snapshot / thumbnail from an HTML page.
  *
  * @author  Manuel Dalla Lana <manuel@pontedilana.it>
  */
@@ -28,7 +28,7 @@ class Image extends AbstractGenerator
     {
         $this->addOptions([
             // Global options
-            'format' => 'png', // forced to 'png', should not be override
+            'format' => 'png', // forced to 'png', should not be overridden
             'encoding' => null,
             'stylesheet' => [], //repeatable
             'media-type' => null,
