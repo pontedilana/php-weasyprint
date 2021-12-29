@@ -86,7 +86,7 @@ $pdf->resetOptions();
 Although PhpWeasyPrint and Snappy are interchangeable, there are a couple of differences between the two, due to WeasyPrint cli API:
 
 * WeasyPrint doesn't support multiple sources to be merged in one single output pdf, so only one input source (string or URL) is accepted in PhpWeasyPrint;
-* WeasyPrint version >= 53 doesn't generate images, so image generation from HTML tring or URL is possible only with WeasyPrint lower versions (`Pontedilana\PhpWeasyPrint\Image` has been successfully tested with Weasyprint 52.5).
+* WeasyPrint version >= 53 doesn't generate images, so image generation from HTML string or URL is possible only with WeasyPrint lower versions (`Pontedilana\PhpWeasyPrint\Image` has been successfully tested with Weasyprint 52.5).
 
 ## Bugs & Support
 

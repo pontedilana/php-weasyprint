@@ -10,6 +10,7 @@ jobs:
         php-version:
           - "7.4"
           - "8.0"
+          - "8.1"
 
     name: PHP ${{ matrix.php-version }}
 
@@ -28,7 +29,6 @@ jobs:
 
       - name: Setup problem matchers for PHPUnit
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
 
       - name: Get composer cache directory
         id: composer-cache

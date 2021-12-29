@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\AbstractGenerator;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 use ReflectionMethod;
 use ReflectionProperty;
 use RuntimeException;
@@ -46,7 +47,7 @@ class AbstractGeneratorTest extends TestCase
         try {
             $r->invokeArgs($media, ['baz', 'bat']);
             $this->fail($message);
-        } catch (InvalidArgumentException $e) {
+        } catch (ReflectionException $e) {
             $this->anything();
         }
     }
@@ -91,7 +92,7 @@ class AbstractGeneratorTest extends TestCase
         try {
             $r->invokeArgs($media, [['bak' => 'bam', 'bah' => 'bap', 'baz' => 'bat']]);
             $this->fail($message);
-        } catch (InvalidArgumentException $e) {
+        } catch (ReflectionException $e) {
             $this->anything();
         }
     }
@@ -508,7 +509,7 @@ class AbstractGeneratorTest extends TestCase
         try {
             $r->invokeArgs($media, [['foo' => 'ban', 'bad' => 'bah']]);
             $this->fail($message);
-        } catch (InvalidArgumentException $e) {
+        } catch (ReflectionException $e) {
             $this->anything();
         }
     }
