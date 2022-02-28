@@ -125,11 +125,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         return $this->getOutput($fileName, $options);
     }
 
-    public function setLogger(LoggerInterface $logger): self
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
-
-        return $this;
     }
 
     /**
