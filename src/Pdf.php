@@ -41,7 +41,7 @@ class Pdf extends AbstractGenerator
             }
 
             if (!empty($value) && \array_key_exists($option, $this->optionsWithContentCheck)) {
-                $saveToTempFile = !$this->isFile($value) && !$this->isOptionUrl($value);
+                $saveToTempFile = is_string($value) && !$this->isFile($value) && !$this->isOptionUrl($value);
                 $fetchUrlContent = 'attachment' === $option && $this->isOptionUrl($value);
 
                 if ($saveToTempFile || $fetchUrlContent) {
