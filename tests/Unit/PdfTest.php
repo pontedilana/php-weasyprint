@@ -138,6 +138,11 @@ class PdfTest extends TestCase
                 ['attachment' => 'https://www.google.com/favicon.ico'],
                 '/emptyBinary --attachment ' . $q . '.*' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
+            // save the content of multiple attachments URL to files and pass those filenames
+            'save the content of multiple attachments URL to files and pass those filenames' => [
+                ['attachment' => ['https://www.google.com/favicon.ico', 'https://github.githubassets.com/favicons/favicon.svg']],
+                '/emptyBinary --attachment ' . $q . '.*' . $q . ' --attachment ' . $q . '.*' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+            ],
         ];
     }
 
