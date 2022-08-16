@@ -6,9 +6,9 @@ use CallbackFilterIterator;
 use DirectoryIterator;
 use FilesystemIterator;
 use PHPUnit\Framework\TestCase;
-use xmarcos\PhpWeasyPrint\Pdf;
 use RecursiveDirectoryIterator;
 use ReflectionMethod;
+use xmarcos\PhpWeasyPrint\Pdf;
 
 /**
  * @covers \xmarcos\PhpWeasyPrint\Pdf

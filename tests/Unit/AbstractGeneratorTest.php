@@ -4,11 +4,11 @@ namespace Tests\Unit\xmarcos\PhpWeasyPrint;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use xmarcos\PhpWeasyPrint\AbstractGenerator;
 use Psr\Log\LoggerInterface;
 use ReflectionMethod;
 use ReflectionProperty;
 use RuntimeException;
+use xmarcos\PhpWeasyPrint\AbstractGenerator;
 
 /**
  * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator
@@ -904,8 +904,6 @@ class AbstractGeneratorTest extends TestCase
         return null; // not found
     }
 }
-
-
 
 class ResetOptionsTest extends AbstractGenerator
 {

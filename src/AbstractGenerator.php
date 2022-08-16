@@ -2,13 +2,13 @@
 
 namespace xmarcos\PhpWeasyPrint;
 
-use xmarcos\PhpWeasyPrint\Exception\CouldNotReadFileContentException;
-use xmarcos\PhpWeasyPrint\Exception\CouldNotReadFileSizeException;
-use xmarcos\PhpWeasyPrint\Exception\FileAlreadyExistsException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Process\Process;
+use xmarcos\PhpWeasyPrint\Exception\CouldNotReadFileContentException;
+use xmarcos\PhpWeasyPrint\Exception\CouldNotReadFileSizeException;
+use xmarcos\PhpWeasyPrint\Exception\FileAlreadyExistsException;
 
 /**
  *  Base generator class for medias.
