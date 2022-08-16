@@ -184,7 +184,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     protected function executeCommand($command)
     {
-        $process = Process::fromShellCommandline($command, null, $this->env);
+        $process = new Process($command, null, $this->env);
 
         if (null !== $this->timeout) {
             $process->setTimeout($this->timeout);
