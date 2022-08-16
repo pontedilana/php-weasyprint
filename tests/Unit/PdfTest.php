@@ -1,23 +1,23 @@
 <?php
 
-namespace Tests\Unit\Pontedilana\PhpWeasyPrint;
+namespace Tests\Unit\xmarcos\PhpWeasyPrint;
 
 use CallbackFilterIterator;
 use DirectoryIterator;
 use FilesystemIterator;
 use PHPUnit\Framework\TestCase;
-use Pontedilana\PhpWeasyPrint\Pdf;
 use RecursiveDirectoryIterator;
 use ReflectionMethod;
+use xmarcos\PhpWeasyPrint\Pdf;
 
 /**
- * @covers \Pontedilana\PhpWeasyPrint\Pdf
+ * @covers \xmarcos\PhpWeasyPrint\Pdf
  */
 class PdfTest extends TestCase
 {
-    public const SHELL_ARG_QUOTE_REGEX = '(?:"|\')'; // escapeshellarg produces double quotes on Windows, single quotes otherwise
+    const SHELL_ARG_QUOTE_REGEX = '(?:"|\')'; // escapeshellarg produces double quotes on Windows, single quotes otherwise
 
-    protected function tearDown(): void
+    protected function tearDown()
     {
         $directory = __DIR__ . '/i-dont-exist';
 
@@ -47,31 +47,31 @@ class PdfTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::__construct
+     * @covers \xmarcos\PhpWeasyPrint\Pdf::__construct
      */
-    public function testCreateInstance(): void
+    public function testCreateInstance()
     {
         $testObject = new Pdf();
         $this->assertInstanceOf(Pdf::class, $testObject);
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::setTemporaryFolder
+     * @covers \xmarcos\PhpWeasyPrint\Pdf::setTemporaryFolder
      */
-    public function testThatSomethingUsingTmpFolder(): void
+    public function testThatSomethingUsingTmpFolder()
     {
         $q = self::SHELL_ARG_QUOTE_REGEX;
         $testObject = new PdfSpy();
         $testObject->setTemporaryFolder(__DIR__);
 
         $testObject->getOutputFromHtml('<html></html>', ['stylesheet' => 'html {font-size: 16px;}']);
-        $this->assertMatchesRegularExpression('/emptyBinary --stylesheet ' . $q . '.*' . $q . ' ' . $q . '.*' . $q . ' ' . $q . '.*' . $q . '/', $testObject->getLastCommand());
+        $this->assertRegExp('/emptyBinary --stylesheet ' . $q . '.*' . $q . ' ' . $q . '.*' . $q . ' ' . $q . '.*' . $q . '/', $testObject->getLastCommand());
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::setTemporaryFolder
+     * @covers \xmarcos\PhpWeasyPrint\Pdf::setTemporaryFolder
      */
-    public function testThatSomethingUsingNonexistentTmpFolder(): void
+    public function testThatSomethingUsingNonexistentTmpFolder()
     {
         $temporaryFolder = \sys_get_temp_dir() . '/i-dont-exist';
 
@@ -80,35 +80,35 @@ class PdfTest extends TestCase
 
         $testObject->getOutputFromHtml('<html></html>', ['stylesheet' => 'html {font-size: 16px;}']);
 
-        $this->assertDirectoryExists($temporaryFolder);
+        $this->assertFileExists($temporaryFolder);
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::createTemporaryFile
+     * @covers \xmarcos\PhpWeasyPrint\Pdf::createTemporaryFile
      */
-    public function testRemovesLocalFilesOnError(): void
+    public function testRemovesLocalFilesOnError()
     {
         $pdf = new PdfSpy();
         $method = new ReflectionMethod($pdf, 'createTemporaryFile');
         $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
-        $this->expectError();
+        $this->expectException('PHPUnit_Framework_Error');
         \trigger_error('test error', \E_USER_ERROR);
-        $this->assertFileDoesNotExist(\reset($pdf->temporaryFiles));
+        $this->assertFileNotExists(\reset($pdf->temporaryFiles));
     }
 
     /**
      * @dataProvider dataOptions
      */
-    public function testOptions(array $options, string $expectedRegex): void
+    public function testOptions($options, $expectedRegex)
     {
         $testObject = new PdfSpy();
         $testObject->getOutputFromHtml('<html></html>', $options);
-        $this->assertMatchesRegularExpression($expectedRegex, $testObject->getLastCommand());
+        $this->assertRegExp($expectedRegex, $testObject->getLastCommand());
     }
 
-    public function dataOptions(): array
+    public function dataOptions()
     {
         $q = self::SHELL_ARG_QUOTE_REGEX;
 
@@ -142,10 +142,10 @@ class PdfTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::createTemporaryFile
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::__destruct
+     * @covers \xmarcos\PhpWeasyPrint\Pdf::createTemporaryFile
+     * @covers \xmarcos\PhpWeasyPrint\Pdf::__destruct
      */
-    public function testRemovesLocalFilesOnDestruct(): void
+    public function testRemovesLocalFilesOnDestruct()
     {
         $pdf = new PdfSpy();
         $method = new ReflectionMethod($pdf, 'createTemporaryFile');
@@ -154,7 +154,7 @@ class PdfTest extends TestCase
         $this->assertCount(1, $pdf->temporaryFiles);
         $this->assertFileExists(\reset($pdf->temporaryFiles));
         $pdf->__destruct();
-        $this->assertFileDoesNotExist(\reset($pdf->temporaryFiles));
+        $this->assertFileNotExists(\reset($pdf->temporaryFiles));
     }
 }
 
@@ -170,12 +170,12 @@ class PdfSpy extends Pdf
         parent::__construct('emptyBinary');
     }
 
-    public function getLastCommand(): string
+    public function getLastCommand()
     {
         return $this->lastCommand;
     }
 
-    public function getOutput($input, array $options = []): string
+    public function getOutput($input, $options = [])
     {
         $filename = $this->createTemporaryFile(null, $this->getDefaultExtension());
         $this->generate($input, $filename, $options, true);
@@ -183,14 +183,14 @@ class PdfSpy extends Pdf
         return 'output';
     }
 
-    protected function executeCommand(string $command): array
+    protected function executeCommand($command)
     {
         $this->lastCommand = $command;
 
         return [0, 'output', 'errorOutput'];
     }
 
-    protected function checkOutput(string $output, string $command): void
+    protected function checkOutput($output, $command)
     {
         //let's say everything went right
     }

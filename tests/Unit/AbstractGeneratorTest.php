@@ -1,24 +1,24 @@
 <?php
 
-namespace Tests\Unit\Pontedilana\PhpWeasyPrint;
+namespace Tests\Unit\xmarcos\PhpWeasyPrint;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Pontedilana\PhpWeasyPrint\AbstractGenerator;
 use Psr\Log\LoggerInterface;
 use ReflectionMethod;
 use ReflectionProperty;
 use RuntimeException;
+use xmarcos\PhpWeasyPrint\AbstractGenerator;
 
 /**
- * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator
+ * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator
  */
 class AbstractGeneratorTest extends TestCase
 {
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::addOption
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::addOption
      */
-    public function testAddOption(): void
+    public function testAddOption()
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
@@ -43,9 +43,9 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::addOption
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::addOption
      */
-    public function testAddOptionException(): void
+    public function testAddOptionException()
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
@@ -58,9 +58,9 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::addOptions
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::addOptions
      */
-    public function testAddOptions(): void
+    public function testAddOptions()
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
@@ -94,9 +94,9 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::addOptions
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::addOptions
      */
-    public function testAddOptionsException(): void
+    public function testAddOptionsException()
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
@@ -109,9 +109,9 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setOption
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::setOption
      */
-    public function testSetOption(): void
+    public function testSetOption()
     {
         $media = $this
             ->getMockBuilder(AbstractGenerator::class)
@@ -151,9 +151,9 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setOptions
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::setOptions
      */
-    public function testSetOptions(): void
+    public function testSetOptions()
     {
         $media = $this
             ->getMockBuilder(AbstractGenerator::class)
@@ -194,12 +194,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::generate
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::generate
      */
-    public function testGenerate(): void
+    public function testGenerate()
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'prepareOutput',
                 'getCommand',
@@ -270,12 +270,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::generate
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::generate
      */
-    public function testFailingGenerate(): void
+    public function testFailingGenerate()
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'prepareOutput',
                 'getCommand',
@@ -342,12 +342,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::generateFromHtml
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::generateFromHtml
      */
-    public function testGenerateFromHtml(): void
+    public function testGenerateFromHtml()
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'generate',
                 'createTemporaryFile',
@@ -380,12 +380,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::getOutput
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::getOutput
      */
-    public function testGetOutput(): void
+    public function testGetOutput()
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'getDefaultExtension',
                 'createTemporaryFile',
@@ -436,12 +436,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::getOutputFromHtml
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::getOutputFromHtml
      */
-    public function testGetOutputFromHtml(): void
+    public function testGetOutputFromHtml()
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'getOutput',
                 'createTemporaryFile',
@@ -472,9 +472,9 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::mergeOptions
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::mergeOptions
      */
-    public function testMergeOptions(): void
+    public function testMergeOptions()
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
@@ -517,9 +517,9 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::mergeOptions
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::mergeOptions
      */
-    public function testMergeOptionsException(): void
+    public function testMergeOptionsException()
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
         $originalOptions = ['foo' => 'bar', 'baz' => 'bat'];
@@ -538,7 +538,7 @@ class AbstractGeneratorTest extends TestCase
     /**
      * @dataProvider dataForBuildCommand
      */
-    public function testBuildCommand(string $binary, string $url, string $path, array $options, string $expected): void
+    public function testBuildCommand($binary, $url, $path, $options, $expected)
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
@@ -548,7 +548,7 @@ class AbstractGeneratorTest extends TestCase
         $this->assertEquals($expected, $r->invokeArgs($media, [$binary, $url, $path, $options]));
     }
 
-    public function dataForBuildCommand(): array
+    public function dataForBuildCommand()
     {
         $theBinary = $this->getPHPExecutableFromPath() . ' -v'; // i.e.: '/usr/bin/php -v'
 
@@ -604,12 +604,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::checkOutput
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::checkOutput
      */
-    public function testCheckOutput(): void
+    public function testCheckOutput()
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'fileExists',
                 'filesize',
@@ -644,12 +644,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::checkOutput
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::checkOutput
      */
-    public function testCheckOutputWhenTheFileDoesNotExist(): void
+    public function testCheckOutputWhenTheFileDoesNotExist()
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'fileExists',
                 'filesize',
@@ -678,12 +678,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::checkOutput
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::checkOutput
      */
-    public function testCheckOutputWhenTheFileIsEmpty(): void
+    public function testCheckOutputWhenTheFileIsEmpty()
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'fileExists',
                 'filesize',
@@ -719,12 +719,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::checkProcessStatus
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::checkProcessStatus
      */
-    public function testCheckProcessStatus(): void
+    public function testCheckProcessStatus()
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods(['configure'])
+            ->setMethods(['configure'])
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -754,11 +754,11 @@ class AbstractGeneratorTest extends TestCase
         }
     }
 
-    public function testItThrowsTheProperExceptionWhenFileExistsAndNotOverwritting(): void
+    public function testItThrowsTheProperExceptionWhenFileExistsAndNotOverwritting()
     {
-        $this->expectException(\Pontedilana\PhpWeasyPrint\Exception\FileAlreadyExistsException::class);
+        $this->expectException(\xmarcos\PhpWeasyPrint\Exception\FileAlreadyExistsException::class);
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'fileExists',
                 'isFile',
@@ -784,12 +784,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::removeTemporaryFiles
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::removeTemporaryFiles
      */
-    public function testCleanupEmptyTemporaryFiles(): void
+    public function testCleanupEmptyTemporaryFiles()
     {
         $generator = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'unlink',
             ])
@@ -816,12 +816,12 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::removeTemporaryFiles
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::removeTemporaryFiles
      */
-    public function testCleanupTemporaryFiles(): void
+    public function testCleanupTemporaryFiles()
     {
         $generator = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
+            ->setMethods([
                 'configure',
                 'unlink',
             ])
@@ -848,19 +848,11 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::resetOptions
+     * @covers \xmarcos\PhpWeasyPrint\AbstractGenerator::resetOptions
      */
-    public function testResetOptions(): void
+    public function testResetOptions()
     {
-        $media = new class('/usr/local/bin/weasyprint') extends AbstractGenerator {
-            protected function configure(): void
-            {
-                $this->addOptions([
-                    'optionA' => null,
-                    'optionB' => 'abc',
-                ]);
-            }
-        };
+        $media = new ResetOptionsTest('/usr/local/bin/weasyprint');
 
         $media->setOption('optionA', 'bar');
 
@@ -883,7 +875,7 @@ class AbstractGeneratorTest extends TestCase
         );
     }
 
-    private function getPHPExecutableFromPath(): ?string
+    private function getPHPExecutableFromPath()
     {
         if (isset($_SERVER['_'])) {
             return $_SERVER['_'];
@@ -910,5 +902,16 @@ class AbstractGeneratorTest extends TestCase
         }
 
         return null; // not found
+    }
+}
+
+class ResetOptionsTest extends AbstractGenerator
+{
+    protected function configure()
+    {
+        $this->addOptions([
+            'optionA' => null,
+            'optionB' => 'abc',
+        ]);
     }
 }

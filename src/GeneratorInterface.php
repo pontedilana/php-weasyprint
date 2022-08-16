@@ -1,6 +1,6 @@
 <?php
 
-namespace Pontedilana\PhpWeasyPrint;
+namespace xmarcos\PhpWeasyPrint;
 
 /**
  * Interface for the media generators.
@@ -19,7 +19,7 @@ interface GeneratorInterface
      * @param array  $options   An array of options for this generation only
      * @param bool   $overwrite Overwrite the file if it exists. If not, throw a FileAlreadyExistsException
      */
-    public function generate(string $input, string $output, array $options = [], bool $overwrite = false): void;
+    public function generate($input, $output, $options = [], $overwrite = false);
 
     /**
      * Generates the output media file from the given HTML.
@@ -29,7 +29,7 @@ interface GeneratorInterface
      * @param array  $options   An array of options for this generation only
      * @param bool   $overwrite Overwrite the file if it exists. If not, throw a FileAlreadyExistsException
      */
-    public function generateFromHtml(string $html, string $output, array $options = [], bool $overwrite = false): void;
+    public function generateFromHtml($html, $output, $options = [], $overwrite = false);
 
     /**
      * Returns the output of the media generated from the specified input HTML
@@ -38,7 +38,7 @@ interface GeneratorInterface
      * @param string $input   The input HTML filename or URL
      * @param array  $options An array of options for this output only
      */
-    public function getOutput(string $input, array $options = []): string;
+    public function getOutput($input, $options = []);
 
     /**
      * Returns the output of the media generated from the given HTML.
@@ -46,5 +46,5 @@ interface GeneratorInterface
      * @param string $html    The HTML to be converted
      * @param array  $options An array of options for this output only
      */
-    public function getOutputFromHtml(string $html, array $options = []): string;
+    public function getOutputFromHtml($html, $options = []);
 }

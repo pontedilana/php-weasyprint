@@ -1,26 +1,26 @@
 <?php
 
-namespace Tests\Unit\Pontedilana\PhpWeasyPrint;
+namespace Tests\Unit\xmarcos\PhpWeasyPrint;
 
 use PHPUnit\Framework\TestCase;
-use Pontedilana\PhpWeasyPrint\Version;
+use xmarcos\PhpWeasyPrint\Version;
 
 class VersionTest extends TestCase
 {
     /**
      * @dataProvider dataVersions
-     * @covers \Pontedilana\PhpWeasyPrint\Version::parseOutput
-     * @covers \Pontedilana\PhpWeasyPrint\Version::__construct
+     * @covers \xmarcos\PhpWeasyPrint\Version::parseOutput
+     * @covers \xmarcos\PhpWeasyPrint\Version::__construct
      */
-    public function testGetVersion(string $versionString, array $expected): void
+    public function testGetVersion($versionString, $expected)
     {
         $versionParser = new Version();
         $output = $versionParser->parseOutput($versionString);
-        $this->assertIsArray($output);
+        $this->assertTrue(is_array($output));
         $this->assertEquals($expected, $output);
     }
 
-    public function dataVersions(): array
+    public function dataVersions()
     {
         return [
             '53.0b2' => [

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pontedilana\PhpWeasyPrint;
+namespace xmarcos\PhpWeasyPrint;
 
 /**
  * Use this class to transform a html/an url to a pdf.
@@ -9,12 +9,12 @@ namespace Pontedilana\PhpWeasyPrint;
  */
 class Pdf extends AbstractGenerator
 {
-    protected array $optionsWithContentCheck = [];
+    protected $optionsWithContentCheck = [];
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(string $binary = null, array $options = [], array $env = null)
+    public function __construct($binary = null, $options = [], $env = null)
     {
         $this->setDefaultExtension('pdf');
         $this->setOptionsWithContentCheck();
@@ -24,14 +24,14 @@ class Pdf extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(string $input, string $output, array $options = [], bool $overwrite = false): void
+    public function generate($input, $output, $options = [], $overwrite = false)
     {
         $options = $this->handleOptions($this->mergeOptions($options));
 
         parent::generate($input, $output, $options, $overwrite);
     }
 
-    protected function handleOptions(array $options = []): array
+    protected function handleOptions($options = [])
     {
         foreach ($options as $option => $value) {
             if (null === $value) {
@@ -60,12 +60,12 @@ class Pdf extends AbstractGenerator
      *
      * @param mixed $option
      */
-    protected function isOptionUrl($option): bool
+    protected function isOptionUrl($option)
     {
         return (bool)\filter_var($option, \FILTER_VALIDATE_URL);
     }
 
-    protected function configure(): void
+    protected function configure()
     {
         $this->addOptions([
             // Global options
@@ -83,7 +83,7 @@ class Pdf extends AbstractGenerator
         ]);
     }
 
-    private function setOptionsWithContentCheck(): void
+    private function setOptionsWithContentCheck()
     {
         $this->optionsWithContentCheck = [
             'stylesheet' => 'css',
