@@ -1,18 +1,20 @@
-# PhpWeasyPrint
+# PhpWeasyPrint for PHP 5.6
 
-PhpWeasyPrint is a PHP library allowing PDF generation from an URL or an HTML page.
-It's a wrapper for [WeasyPrint](https://weasyprint.org/), a smart solution helping web developers to create PDF documents, available everywhere Python runs.
+[![Latest Stable Version](https://poser.pugx.org/xmarcos/php-weasyprint/v)](https://packagist.org/packages/xmarcos/php-weasyprint) [![Total Downloads](https://poser.pugx.org/xmarcos/php-weasyprint/downloads)](https://packagist.org/packages/xmarcos/php-weasyprint) [![License](https://poser.pugx.org/xmarcos/php-weasyprint/license)](https://packagist.org/packages/xmarcos/php-weasyprint) [![PHP Version Require](https://poser.pugx.org/xmarcos/php-weasyprint/require/php)](https://packagist.org/packages/xmarcos/php-weasyprint)
 
-You will have to download and install WeasyPrint to use PhpWeasyPrint (version 53 or greater is recommended).
+PhpWeasyPrint is a wrapper for [WeasyPrint](https://weasyprint.org), an alternative to [wkhtmltopdf](https://wkhtmltopdf.org).
 
-This library is massively inspired by [KnpLabs/snappy](https://github.com/KnpLabs/snappy), of which it aims to be a one-to-one substitute (`GeneratorInterface` is the same).
-See "[Differences with Snappy](#differences-with-snappy)" section to see how the two differs
+:warning: This is a backport of [`pontedilana/php-weasyprint`](https://github.com/pontedilana/php-weasyprint) for legacy applications running PHP 5.6 —which have reached end-of-life and should not be used in production.
 
-## Installation using [Composer](http://getcomposer.org/)
+This original library is massively inspired by [KnpLabs/snappy](https://github.com/KnpLabs/snappy), of which it aims to be a one-to-one substitute (`GeneratorInterface` is the same). Checkout its [README](https://github.com/pontedilana/php-weasyprint/blob/main/README.md) for more information.
+
+## Installation
 
 ```bash
-$ composer require pontedilana/php-weasyprint
+composer require xmarcos/php-weasyprint
 ```
+
+> You need to have WeasyPrint installed and available in your path as well.
 
 ## Usage
 
@@ -23,19 +25,15 @@ $ composer require pontedilana/php-weasyprint
 
 require __DIR__ . '/vendor/autoload.php';
 
-use Pontedilana\PhpWeasyPrint\Pdf;
+use xmarcos\PhpWeasyPrint\Pdf;
 
-$pdf = new Pdf('/usr/local/bin/weasyprint');
-
-// or you can do it in two steps
-$pdf = new Pdf();
-$pdf->setBinary('/usr/local/bin/weasyprint');
+$pdf = new Pdf('/usr/bin/weasyprint');
 ```
 
 ### Display the pdf in the browser
 
 ```php
-$pdf = new Pdf('/usr/local/bin/weasyprint');
+$pdf = new Pdf('/usr/bin/weasyprint');
 header('Content-Type: application/pdf');
 echo $pdf->getOutput('http://www.github.com');
 ```
@@ -43,24 +41,33 @@ echo $pdf->getOutput('http://www.github.com');
 ### Download the pdf from the browser
 
 ```php
-$pdf = new Pdf('/usr/local/bin/weasyprint');
+$pdf = new Pdf('/usr/bin/weasyprint');
 header('Content-Type: application/pdf');
 header('Content-Disposition: attachment; filename="file.pdf"');
 echo $pdf->getOutput('http://www.github.com');
 ```
 
-### Generate local pdf file
+### Generate local pdf file from HTML
 
 ```php
-$pdf = new Pdf('/usr/local/bin/weasyprint');
+$pdf = new Pdf('/usr/bin/weasyprint');
 $pdf->generateFromHtml('<h1>Bill</h1><p>You owe me money, dude.</p>', '/tmp/bill-123.pdf');
 ```
 
-### Pass options to PhpWeasyPrint
+### Generate local pdf file from URL
+
+```php
+$pdf = new Pdf('/usr/bin/weasyprint');
+$pdf->generate('http://www.github.com', '/local/path-to.pdf');
+```
+
+### Pass arguments to `weasyprint`
+
+> See weasyprint [Command-line API](https://doc.courtbouillon.org/weasyprint/stable/api_reference.html#command-line-api) for an explanation of these options.
 
 ```php
 // Type weasyprint -h to see the list of options
-$pdf = new Pdf('/usr/local/bin/weasyprint');
+$pdf = new Pdf('/usr/bin/weasyprint');
 $pdf->setOption('encoding', 'utf8');
 $pdf->setOption('media-type', 'screen');
 $pdf->setOption('presentational-hints');
@@ -69,11 +76,12 @@ $pdf->setOption('stylesheet', ['/path/to/first-style.css', '/path/to/second-styl
 $pdf->setOption('attachment', ['/path/to/image.png', '/path/to/logo.jpg']);
 ```
 
-### Reset options
-Options can be reset to their initial values with `resetOptions()` method.
+### Reset arguments
+
+Options/arguments can be reset to their initial values with `resetOptions()` method.
 
 ```php
-$pdf = new Pdf('/usr/local/bin/weasyprint');
+$pdf = new Pdf('/usr/bin/weasyprint');
 // Set some options
 $pdf->setOption('media-type', 'screen');
 // ..
@@ -81,26 +89,11 @@ $pdf->setOption('media-type', 'screen');
 $pdf->resetOptions();
 ```
 
-## Differences with Snappy
-
-Although PhpWeasyPrint and Snappy are interchangeable, there are a couple of differences between the two, due to WeasyPrint cli API:
-
-* WeasyPrint doesn't support multiple sources to be merged in one single output pdf, so only one input source (string or URL) is accepted in PhpWeasyPrint;
-* WeasyPrint version >= 53 doesn't generate images, so image generation from HTML string or URL is possible only with WeasyPrint lower versions (`Pontedilana\PhpWeasyPrint\Image` has been successfully tested with Weasyprint 52.5).
-
 ## Bugs & Support
 
-If you found a bug please fill a [detailed issue](https://github.com/pontedilana/php-weasyprint/issues) with all the following points.
-If you need some help, please at least provide a complete reproducer so we could help you based on facts rather than assumptions.
-
-* OS and its version
-* WeasyPrint, its version and how you installed it
-* A complete reproducer with relevant PHP and html/css/js code
-
-If your reproducer is big, please try to shrink it. It will help everyone to narrow the bug.
+If you need support for a version of PHP other than 5.6, please see the original library. The only goal of this fork is to support legacy applications running PHP 5.6 until they can be upgraded or sunset. It should be possible to use this code for even older versions, but I don't have the need nor the time to try them.
 
 ## Credits
 
-PhpWeasyPrint has been originally developed by the [Pontedilana](https://www.pontedilana.it) dev team.  
-Snappy has been originally developed by the [KnpLabs](http://knplabs.com) team.
-
+- PhpWeasyPrint has been originally developed by the [Pontedilana](https://www.pontedilana.it) dev team.
+- Snappy has been originally developed by the [KnpLabs](http://knplabs.com) team.

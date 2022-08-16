@@ -8,9 +8,7 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - "7.4"
-          - "8.0"
-          - "8.1"
+          - "5.6"
 
     name: PHP ${{ matrix.php-version }}
 
@@ -22,7 +20,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: phpstan
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
@@ -46,6 +43,3 @@ jobs:
 
       - name: Test with PHPUnit
         run: ./vendor/bin/phpunit
-
-      - name: Run PHPStan
-        run: phpstan analyse src
