@@ -2,4 +2,5 @@
 /.phpunit.cache/
 /.infection/
 /.php-cs-fixer.cache
+/.php_cs.cache
 /composer.lock
