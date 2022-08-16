@@ -1,6 +1,6 @@
 <?php
 
-namespace Pontedilana\PhpWeasyPrint\Exception;
+namespace xmarcos\PhpWeasyPrint\Exception;
 
 class UnsupportedWeasyPrintVersionException extends \RuntimeException
 {

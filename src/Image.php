@@ -1,8 +1,8 @@
 <?php
 
-namespace Pontedilana\PhpWeasyPrint;
+namespace xmarcos\PhpWeasyPrint;
 
-use Pontedilana\PhpWeasyPrint\Exception\UnsupportedWeasyPrintVersionException;
+use xmarcos\PhpWeasyPrint\Exception\UnsupportedWeasyPrintVersionException;
 
 /**
  * Use this class to create a snapshot / thumbnail from an HTML page.
@@ -11,12 +11,12 @@ use Pontedilana\PhpWeasyPrint\Exception\UnsupportedWeasyPrintVersionException;
  */
 class Image extends AbstractGenerator
 {
-    private Version $binaryVersion;
+    private $binaryVersion;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(string $binary = null, array $options = [], array $env = null)
+    public function __construct($binary = null, $options = [], $env = null)
     {
         parent::__construct($binary, $options, $env);
 
@@ -24,7 +24,7 @@ class Image extends AbstractGenerator
         $this->binaryVersion = new Version($this->getBinary());
     }
 
-    protected function configure(): void
+    protected function configure()
     {
         $this->addOptions([
             // Global options
@@ -41,33 +41,33 @@ class Image extends AbstractGenerator
         ]);
     }
 
-    public function generate(string $input, string $output, array $options = [], bool $overwrite = false): void
+    public function generate($input, $output, $options = [], $overwrite = false)
     {
         $this->assertVersionIsCompatible();
         parent::generate($input, $output, $options, $overwrite);
     }
 
-    public function generateFromHtml(string $html, string $output, array $options = [], bool $overwrite = false): void
+    public function generateFromHtml($html, $output, $options = [], $overwrite = false)
     {
         $this->assertVersionIsCompatible();
         parent::generateFromHtml($html, $output, $options, $overwrite);
     }
 
-    public function getOutput(string $input, array $options = []): string
+    public function getOutput($input, $options = [])
     {
         $this->assertVersionIsCompatible();
 
         return parent::getOutput($input, $options);
     }
 
-    public function getOutputFromHtml(string $html, array $options = []): string
+    public function getOutputFromHtml($html, $options = [])
     {
         $this->assertVersionIsCompatible();
 
         return parent::getOutputFromHtml($html, $options);
     }
 
-    private function assertVersionIsCompatible(): void
+    private function assertVersionIsCompatible()
     {
         if ($this->binaryVersion->getMajorVersion() >= '53') {
             throw new UnsupportedWeasyPrintVersionException('Image generation is unsupported in WeasyPrint >= 53');

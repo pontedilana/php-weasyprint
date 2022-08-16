@@ -1,34 +1,34 @@
 <?php
 
-namespace Pontedilana\PhpWeasyPrint;
+namespace xmarcos\PhpWeasyPrint;
 
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class Version
 {
-    private ?string $binary;
+    private $binary;
 
-    public function __construct(?string $binary = '/usr/local/bin/weasyprint')
+    public function __construct($binary = '/usr/local/bin/weasyprint')
     {
         $this->binary = $binary;
     }
 
-    public function getVersion(): array
+    public function getVersion()
     {
         $output = $this->runCommand();
 
         return $this->parseOutput($output);
     }
 
-    public function getMajorVersion(): string
+    public function getMajorVersion()
     {
         $output = $this->runCommand();
 
         return $this->parseOutput($output)['major'];
     }
 
-    public function parseOutput(string $output): array
+    public function parseOutput($output)
     {
         $re = '/^WeasyPrint version (?P<fullversion>((?P<major>\d+)\.?(?P<minor>.*)))$/';
         preg_match($re, $output, $matches);
@@ -40,7 +40,7 @@ class Version
         ];
     }
 
-    private function runCommand(): string
+    private function runCommand()
     {
         $process = new Process([$this->binary, '--version']);
         $process->run();
