@@ -93,6 +93,29 @@ $pdf->setOption('media-type', 'screen');
 $pdf->resetOptions();
 ```
 
+## Integration Test
+
+There is a very simple integration test included for convenience. It's using the same docker image and exact same python and weasyprint versions that the project that originated this fork requires. Don't expect that to be a very comprehensive suite, just there to ensure it works. That said, run it like this:
+
+```bash
+# build image
+docker build -t php56 .
+
+# run the image, which runs the unit and integration tests
+docker run -it --rm php56
+
+#  Expected Output:
+
+# Time: 102 ms, Memory: 5.50MB
+# OK (41 tests, 64 assertions)
+# Running Integration Test with 'WeasyPrint version 52.5'
+#     PDF Generated: OK
+#     PDF Size: 17251
+#     PDF Content: OK
+
+
+```
+
 ## Bugs & Support
 
 If you need support for a version of PHP other than 5.6, please see the original library. The only goal of this fork is to support legacy applications running PHP 5.6 until they can be upgraded or sunset. It should be possible to use this code for even older versions, but I don't have the need nor the time to try them.
