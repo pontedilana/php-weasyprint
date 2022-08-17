@@ -1,10 +1,10 @@
 # PhpWeasyPrint for PHP 5.6
 
 ![CI Status](https://github.com/xmarcos/php-weasyprint/actions/workflows/ci.yaml/badge.svg)
-[![Latest Stable Version](https://poser.pugx.org/xmarcos/php-weasyprint/v)](https://packagist.org/packages/xmarcos/php-weasyprint)
-[![Total Downloads](https://poser.pugx.org/xmarcos/php-weasyprint/downloads)](https://packagist.org/packages/xmarcos/php-weasyprint)
-[![License](https://poser.pugx.org/xmarcos/php-weasyprint/license)](https://packagist.org/packages/xmarcos/php-weasyprint)
-[![PHP Version Require](https://poser.pugx.org/xmarcos/php-weasyprint/require/php)](https://packagist.org/packages/xmarcos/php-weasyprint)
+[![Latest Stable Version](http://poser.pugx.org/xmarcos/php-weasyprint/v)](https://packagist.org/packages/xmarcos/php-weasyprint)
+[![Total Downloads](http://poser.pugx.org/xmarcos/php-weasyprint/downloads)](https://packagist.org/packages/xmarcos/php-weasyprint)
+[![License](http://poser.pugx.org/xmarcos/php-weasyprint/license)](https://packagist.org/packages/xmarcos/php-weasyprint)
+[![PHP Version Require](http://poser.pugx.org/xmarcos/php-weasyprint/require/php)](https://packagist.org/packages/xmarcos/php-weasyprint)
 
 PhpWeasyPrint is a wrapper for [WeasyPrint](https://weasyprint.org), an alternative to [wkhtmltopdf](https://wkhtmltopdf.org).
 
