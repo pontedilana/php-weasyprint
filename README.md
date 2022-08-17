@@ -1,6 +1,6 @@
 # PhpWeasyPrint for PHP 5.6
 
-![CI Status](https://github.com/xmarcos/php-weasyprint/actions/workflows/ci.yaml/badge.svg)
+[![CI Status](https://github.com/xmarcos/php-weasyprint/actions/workflows/ci.yaml/badge.svg)](https://github.com/xmarcos/php-weasyprint/actions/workflows/ci.yaml)
 [![Latest Stable Version](http://poser.pugx.org/xmarcos/php-weasyprint/v)](https://packagist.org/packages/xmarcos/php-weasyprint)
 [![Total Downloads](http://poser.pugx.org/xmarcos/php-weasyprint/downloads)](https://packagist.org/packages/xmarcos/php-weasyprint)
 [![License](http://poser.pugx.org/xmarcos/php-weasyprint/license)](https://packagist.org/packages/xmarcos/php-weasyprint)
