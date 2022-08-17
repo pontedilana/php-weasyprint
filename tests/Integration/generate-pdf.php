@@ -7,9 +7,14 @@ use Symfony\Component\Process\Process;
 
 $weasyprint_bin = '/usr/bin/weasyprint';
 
-echo sprintf('Testing integration with the "%s"', $weasyprint_bin);
-
 try {
+
+  $version_cmd = sprintf("%s --version 2>/dev/null", $weasyprint_bin);
+  $version = new Process($version_cmd);
+  $version->run();
+
+  echo sprintf("\nRunning Integration Test with '%s'\n", trim($version->getOutput()));
+
   $url = 'https://twitter.com/robots.txt';
   $pdf_file = 'robots.pdf';
   $pdf_generator = new WeasyPdf($weasyprint_bin);
