@@ -1,0 +1,14 @@
+{
+  "name": "tests/integration",
+  "minimum-stability": "dev",
+  "require": {
+    "php": "^5.6",
+    "xmarcos/php-weasyprint": "*"
+  },
+  "repositories": [
+    {
+      "type": "path",
+      "url": "/code"
+    }
+  ]
+}
