@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 0.12.0 - 2022-12-09
+### Changed
+- Add support for PHP 8.2
+
 ## 0.11.0 - 2022-02-28
 ### Changed
 - Bump symfony/process up to ^6.0 and psr/log up to ^3.0
