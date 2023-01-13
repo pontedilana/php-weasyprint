@@ -7,6 +7,8 @@ use Pontedilana\PhpWeasyPrint\Image;
 
 /**
  * @covers \Pontedilana\PhpWeasyPrint\Image
+ *
+ * @deprecated 1.0.0 Image class is deprecated and will be removed
  */
 class ImageTest extends TestCase
 {
