@@ -5,6 +5,9 @@ namespace Tests\Unit\Pontedilana\PhpWeasyPrint;
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\Version;
 
+/**
+ * @deprecated 1.0.0 Version class is deprecated and will be removed
+ */
 class VersionTest extends TestCase
 {
     /**

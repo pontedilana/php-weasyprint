@@ -5,6 +5,9 @@ namespace Pontedilana\PhpWeasyPrint;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
+/**
+ * @deprecated 1.0.0 This class is used only by Image class which is deprecated
+ */
 class Version
 {
     private ?string $binary;
