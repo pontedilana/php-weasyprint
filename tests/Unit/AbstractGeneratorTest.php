@@ -2,13 +2,9 @@
 
 namespace Tests\Unit\Pontedilana\PhpWeasyPrint;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\AbstractGenerator;
 use Psr\Log\LoggerInterface;
-use ReflectionMethod;
-use ReflectionProperty;
-use RuntimeException;
 
 /**
  * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator
@@ -24,7 +20,7 @@ class AbstractGeneratorTest extends TestCase
 
         $this->assertEquals([], $media->getOptions());
 
-        $r = new ReflectionMethod($media, 'addOption');
+        $r = new \ReflectionMethod($media, 'addOption');
         $r->setAccessible(true);
         $r->invokeArgs($media, ['foo', 'bar']);
 
@@ -49,11 +45,11 @@ class AbstractGeneratorTest extends TestCase
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
-        $r = new ReflectionMethod($media, 'addOption');
+        $r = new \ReflectionMethod($media, 'addOption');
         $r->setAccessible(true);
         $r->invokeArgs($media, ['foo', 'bar']);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $r->invokeArgs($media, ['foo', 'baz']);
     }
 
@@ -66,7 +62,7 @@ class AbstractGeneratorTest extends TestCase
 
         $this->assertEquals([], $media->getOptions());
 
-        $r = new ReflectionMethod($media, 'addOptions');
+        $r = new \ReflectionMethod($media, 'addOptions');
         $r->setAccessible(true);
         $r->invokeArgs($media, [['foo' => 'bar', 'baz' => 'bat']]);
 
@@ -100,11 +96,11 @@ class AbstractGeneratorTest extends TestCase
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
-        $r = new ReflectionMethod($media, 'addOptions');
+        $r = new \ReflectionMethod($media, 'addOptions');
         $r->setAccessible(true);
         $r->invokeArgs($media, [['foo' => 'bar', 'baz' => 'bat']]);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $r->invokeArgs($media, [['foo' => 'baz']]);
     }
 
@@ -126,7 +122,7 @@ class AbstractGeneratorTest extends TestCase
         $media->setLogger($logger);
         $logger->expects($this->once())->method('debug');
 
-        $r = new ReflectionMethod($media, 'addOption');
+        $r = new \ReflectionMethod($media, 'addOption');
         $r->setAccessible(true);
         $r->invokeArgs($media, ['foo', 'bar']);
 
@@ -145,7 +141,7 @@ class AbstractGeneratorTest extends TestCase
         try {
             $media->setOption('bad', 'def');
             $this->fail($message);
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->anything();
         }
     }
@@ -168,7 +164,7 @@ class AbstractGeneratorTest extends TestCase
         $media->setLogger($logger);
         $logger->expects($this->exactly(4))->method('debug');
 
-        $r = new ReflectionMethod($media, 'addOptions');
+        $r = new \ReflectionMethod($media, 'addOptions');
         $r->setAccessible(true);
         $r->invokeArgs($media, [['foo' => 'bar', 'baz' => 'bat']]);
 
@@ -188,7 +184,7 @@ class AbstractGeneratorTest extends TestCase
         try {
             $media->setOptions(['foo' => 'abc', 'baz' => 'def', 'bad' => 'ghi']);
             $this->fail($message);
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->anything();
         }
     }
@@ -333,10 +329,10 @@ class AbstractGeneratorTest extends TestCase
             ->expects($this->once())
             ->method('checkProcessStatus')
             ->with(1, 'stdout', 'stderr', 'the command')
-            ->willThrowException(new RuntimeException())
+            ->willThrowException(new \RuntimeException())
         ;
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
 
         $media->generate('the_input_file', 'the_output_file', ['foo' => 'bar']);
     }
@@ -480,11 +476,11 @@ class AbstractGeneratorTest extends TestCase
 
         $originalOptions = ['foo' => 'bar', 'baz' => 'bat'];
 
-        $addOptions = new ReflectionMethod($media, 'addOptions');
+        $addOptions = new \ReflectionMethod($media, 'addOptions');
         $addOptions->setAccessible(true);
         $addOptions->invokeArgs($media, [$originalOptions]);
 
-        $r = new ReflectionMethod($media, 'mergeOptions');
+        $r = new \ReflectionMethod($media, 'mergeOptions');
         $r->setAccessible(true);
 
         $mergedOptions = $r->invokeArgs($media, [['foo' => 'ban']]);
@@ -524,14 +520,14 @@ class AbstractGeneratorTest extends TestCase
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
         $originalOptions = ['foo' => 'bar', 'baz' => 'bat'];
 
-        $addOptions = new ReflectionMethod($media, 'addOptions');
+        $addOptions = new \ReflectionMethod($media, 'addOptions');
         $addOptions->setAccessible(true);
         $addOptions->invokeArgs($media, [$originalOptions]);
 
-        $r = new ReflectionMethod($media, 'mergeOptions');
+        $r = new \ReflectionMethod($media, 'mergeOptions');
         $r->setAccessible(true);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $mergedOptions = $r->invokeArgs($media, [['bad' => 'ban']]);
     }
 
@@ -542,7 +538,7 @@ class AbstractGeneratorTest extends TestCase
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
-        $r = new ReflectionMethod($media, 'buildCommand');
+        $r = new \ReflectionMethod($media, 'buildCommand');
         $r->setAccessible(true);
 
         $this->assertEquals($expected, $r->invokeArgs($media, [$binary, $url, $path, $options]));
@@ -598,7 +594,7 @@ class AbstractGeneratorTest extends TestCase
                 [
                     'resolution' => 100,
                 ],
-                $theBinary . ' ' . '--resolution 100 ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
+                $theBinary . ' --resolution 100 ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
             ],
         ];
     }
@@ -630,7 +626,7 @@ class AbstractGeneratorTest extends TestCase
             ->willReturn(123)
         ;
 
-        $r = new ReflectionMethod($media, 'checkOutput');
+        $r = new \ReflectionMethod($media, 'checkOutput');
         $r->setAccessible(true);
 
         $message = '->checkOutput() checks both file existence and size';
@@ -638,7 +634,7 @@ class AbstractGeneratorTest extends TestCase
         try {
             $r->invokeArgs($media, ['the_output_file', 'the command']);
             $this->anything();
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->fail($message);
         }
     }
@@ -664,7 +660,7 @@ class AbstractGeneratorTest extends TestCase
             ->willReturn(false)
         ;
 
-        $r = new ReflectionMethod($media, 'checkOutput');
+        $r = new \ReflectionMethod($media, 'checkOutput');
         $r->setAccessible(true);
 
         $message = '->checkOutput() throws an InvalidArgumentException when the file does not exist';
@@ -672,7 +668,7 @@ class AbstractGeneratorTest extends TestCase
         try {
             $r->invokeArgs($media, ['the_output_file', 'the command']);
             $this->fail($message);
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->anything();
         }
     }
@@ -705,7 +701,7 @@ class AbstractGeneratorTest extends TestCase
             ->willReturn(0)
         ;
 
-        $r = new ReflectionMethod($media, 'checkOutput');
+        $r = new \ReflectionMethod($media, 'checkOutput');
         $r->setAccessible(true);
 
         $message = '->checkOutput() throws an InvalidArgumentException when the file is empty';
@@ -713,7 +709,7 @@ class AbstractGeneratorTest extends TestCase
         try {
             $r->invokeArgs($media, ['the_output_file', 'the command']);
             $this->fail($message);
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->anything();
         }
     }
@@ -729,27 +725,27 @@ class AbstractGeneratorTest extends TestCase
             ->getMock()
         ;
 
-        $r = new ReflectionMethod($media, 'checkProcessStatus');
+        $r = new \ReflectionMethod($media, 'checkProcessStatus');
         $r->setAccessible(true);
 
         try {
             $r->invokeArgs($media, [0, '', '', 'the command']);
             $this->anything();
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->fail('0 status means success');
         }
 
         try {
             $r->invokeArgs($media, [1, '', '', 'the command']);
             $this->anything();
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->fail('1 status means failure, but no stderr content');
         }
 
         try {
             $r->invokeArgs($media, [1, '', 'Could not connect to X', 'the command']);
             $this->fail('1 status means failure');
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->assertEquals(1, $e->getCode(), 'Exception thrown by checkProcessStatus should pass on the error code');
         }
     }
@@ -777,7 +773,7 @@ class AbstractGeneratorTest extends TestCase
             ->method('isFile')
             ->willReturn(true)
         ;
-        $r = new ReflectionMethod($media, 'prepareOutput');
+        $r = new \ReflectionMethod($media, 'prepareOutput');
         $r->setAccessible(true);
 
         $r->invokeArgs($media, ['', false]);
@@ -802,15 +798,15 @@ class AbstractGeneratorTest extends TestCase
             ->method('unlink')
         ;
 
-        $create = new ReflectionMethod($generator, 'createTemporaryFile');
+        $create = new \ReflectionMethod($generator, 'createTemporaryFile');
         $create->setAccessible(true);
         $create->invoke($generator, null, null);
 
-        $files = new ReflectionProperty($generator, 'temporaryFiles');
+        $files = new \ReflectionProperty($generator, 'temporaryFiles');
         $files->setAccessible(true);
         $this->assertCount(1, $files->getValue($generator));
 
-        $remove = new ReflectionMethod($generator, 'removeTemporaryFiles');
+        $remove = new \ReflectionMethod($generator, 'removeTemporaryFiles');
         $remove->setAccessible(true);
         $remove->invoke($generator);
     }
@@ -834,15 +830,15 @@ class AbstractGeneratorTest extends TestCase
             ->method('unlink')
         ;
 
-        $create = new ReflectionMethod($generator, 'createTemporaryFile');
+        $create = new \ReflectionMethod($generator, 'createTemporaryFile');
         $create->setAccessible(true);
         $create->invoke($generator, '<html/>', 'html');
 
-        $files = new ReflectionProperty($generator, 'temporaryFiles');
+        $files = new \ReflectionProperty($generator, 'temporaryFiles');
         $files->setAccessible(true);
         $this->assertCount(1, $files->getValue($generator));
 
-        $remove = new ReflectionMethod($generator, 'removeTemporaryFiles');
+        $remove = new \ReflectionMethod($generator, 'removeTemporaryFiles');
         $remove->setAccessible(true);
         $remove->invoke($generator);
     }

@@ -9,6 +9,7 @@ class VersionTest extends TestCase
 {
     /**
      * @dataProvider dataVersions
+     *
      * @covers \Pontedilana\PhpWeasyPrint\Version::parseOutput
      * @covers \Pontedilana\PhpWeasyPrint\Version::__construct
      */
