@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Pontedilana\PhpWeasyPrint;
+namespace Pontedilana\PhpWeasyPrint\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\Version;

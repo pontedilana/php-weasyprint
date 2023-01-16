@@ -32,7 +32,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Unit\\Pontedilana\\PhpWeasyPrint\\": "tests/Unit/"
+            "Pontedilana\\PhpWeasyPrint\\Tests\\": "tests/"
         }
     },
     "scripts": {
