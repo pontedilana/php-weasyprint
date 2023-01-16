@@ -9,6 +9,9 @@ namespace Pontedilana\PhpWeasyPrint;
  */
 class Pdf extends AbstractGenerator
 {
+    /**
+     * @var array<string, string>
+     */
     protected array $optionsWithContentCheck = [];
 
     /**
@@ -31,6 +34,11 @@ class Pdf extends AbstractGenerator
         parent::generate($input, $output, $options, $overwrite);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<string, mixed>
+     */
     protected function handleOptions(array $options = []): array
     {
         foreach ($options as $option => $value) {

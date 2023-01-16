@@ -20,15 +20,25 @@ use Symfony\Component\Process\Process;
 abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInterface
 {
     public const DEFAULT_TIMEOUT = 10;
+
+    /** @var list<string> */
     public array $temporaryFiles = [];
     protected ?string $temporaryFolder = null;
     private LoggerInterface $logger;
     private string $defaultExtension;
+
+    /** @var array<string, mixed>|null */
     private ?array $env;
     private ?int $timeout = null;
+
+    /** @var array<string, mixed> */
     private array $options = [];
     private ?string $binary = null;
 
+    /**
+     * @param array<string, mixed>      $options
+     * @param array<string, mixed>|null $env
+     */
     public function __construct(string $binary = null, array $options = [], array $env = null)
     {
         $this->configure();
@@ -79,8 +89,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
             $this->logger->error(\sprintf('An error happened while generating "%s".', $output), [
                 'command' => $command,
                 'status' => $status ?? null,
-                'stdout' => $stdout ?? null,
-                'stderr' => $stderr ?? null,
+                'stdout' => $stdout,
+                'stderr' => $stderr,
             ]);
 
             throw $e;
@@ -133,10 +143,10 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Builds the command string.
      *
-     * @param string $binary  The binary path/name
-     * @param string $input   Url or file location of the page to process
-     * @param string $output  File location to the pdf-or-image-to-be
-     * @param array  $options An array of options
+     * @param string               $binary  The binary path/name
+     * @param string               $input   Url or file location of the page to process
+     * @param string               $output  File location to the pdf-or-image-to-be
+     * @param array<string, mixed> $options An array of options
      */
     protected function buildCommand(string $binary, string $input, string $output, array $options = []): string
     {
@@ -177,7 +187,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Executes the given command via shell and returns the complete output as
      * a string.
      *
-     * @return array [status, stdout, stderr]
+     * @return array{int|null, string, string} [status, stdout, stderr]
      */
     protected function executeCommand(string $command): array
     {
@@ -267,9 +277,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Returns the command for the given input and output files.
      *
-     * @param string $input   The input file
-     * @param string $output  The ouput file
-     * @param array  $options An optional array of options that will be used only for this command
+     * @param string               $input   The input file
+     * @param string               $output  The ouput file
+     * @param array<string, mixed> $options An optional array of options that will be used only for this command
      */
     public function getCommand(string $input, string $output, array $options = []): string
     {
@@ -371,7 +381,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Sets an array of options.
      *
-     * @param array $options An associative array of options as name/value
+     * @param array<string, mixed> $options An associative array of options as name/value
      */
     public function setOptions(array $options): self
     {
@@ -384,6 +394,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
 
     /**
      * Returns all the options.
+     *
+     * @return array<string, mixed>
      */
     public function getOptions(): array
     {
@@ -411,6 +423,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
 
     /**
      * Adds an array of options.
+     *
+     * @param array<string, mixed> $options
      */
     protected function addOptions(array $options): self
     {
@@ -424,6 +438,10 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Merges the given array of options to the instance options and returns
      * the result options array. It does NOT change the instance options.
+     *
+     * @param array<string, mixed> $options
+     *
+     * @return array<string, mixed>
      *
      * @throws \InvalidArgumentException
      */
@@ -475,17 +493,21 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Checks the process return status.
      *
-     * @param int    $status  The exit status code
+     * @param ?int   $status  The exit status code
      * @param string $stdout  The stdout content
      * @param string $stderr  The stderr content
      * @param string $command The run command
      *
      * @throws \RuntimeException if the output file generation failed
      */
-    protected function checkProcessStatus(int $status, string $stdout, string $stderr, string $command): void
+    protected function checkProcessStatus(?int $status, string $stdout, string $stderr, string $command): void
     {
+        if (null === $status) {
+            throw new \RuntimeException(sprintf('The command is not terminated.' . "\n" . 'stderr: "%s"' . "\n" . 'stdout: "%s"' . "\n" . 'command: %s', $stderr, $stdout, $command));
+        }
+
         if (0 !== $status && '' !== $stderr) {
-            throw new \RuntimeException(\sprintf('The exit status code \'%s\' says something went wrong:' . "\n" . 'stderr: "%s"' . "\n" . 'stdout: "%s"' . "\n" . 'command: %s.', $status, $stderr, $stdout, $command), $status);
+            throw new \RuntimeException(\sprintf('The exit status code \'%s\' says something went wrong:' . "\n" . 'stderr: "%s"' . "\n" . 'stdout: "%s"' . "\n" . 'command: %s', $status, $stderr, $stdout, $command), $status);
         }
     }
 
