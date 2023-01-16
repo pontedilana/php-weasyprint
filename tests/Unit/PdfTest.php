@@ -101,8 +101,8 @@ class PdfTest extends TestCase
     {
         $testObject = new PdfSpy();
         $testObject->getOutputFromHtml('<html></html>', $options);
+        // fwrite(\STDERR, print_r($testObject->getLastCommand() . "\n\n", true));
         $this->assertMatchesRegularExpression($expectedRegex, $testObject->getLastCommand());
-        // fwrite(STDERR, print_r($testObject->getLastCommand() . "\n\n", TRUE));
     }
 
     public function dataOptions(): array
@@ -110,33 +110,46 @@ class PdfTest extends TestCase
         $q = self::SHELL_ARG_QUOTE_REGEX;
 
         return [
-            'no options' => [
+            '0 - no options' => [
                 [],
                 '/emptyBinary ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
 
-            'pass a single stylesheet URL' => [
+            '1 - pass a single stylesheet URL' => [
                 ['stylesheet' => 'https://google.com'],
                 '/emptyBinary --stylesheet ' . $q . 'https:\/\/google\.com' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
 
-            'pass a single stylesheet file' => [
+            '2 - pass a single stylesheet file' => [
                 ['stylesheet' => __DIR__ . '/../Fixture/style1.css'],
                 '/emptyBinary --stylesheet ' . $q . \preg_quote(__DIR__ . '/../Fixture/style1.css', '/') . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
-            'save the given stylesheet CSS string into a temporary file and pass that filename' => [
+
+            '3 - pass two stylesheet files' => [
+                ['stylesheet' => [__DIR__ . '/../Fixture/style1.css', __DIR__ . '/../Fixture/style2.css']],
+                '/emptyBinary --stylesheet ' . $q . \preg_quote(__DIR__ . '/../Fixture/style1.css', '/') . $q . ' '
+                . '--stylesheet ' . $q . \preg_quote(__DIR__ . '/../Fixture/style2.css', '/') . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+            ],
+
+            '4 - pass one stylesheet file and one inline css' => [
+                ['stylesheet' => [__DIR__ . '/../Fixture/style1.css', 'html {font-size: 24px;}']],
+                '/emptyBinary --stylesheet ' . $q . \preg_quote(__DIR__ . '/../Fixture/style1.css', '/') . $q . ' '
+                . '--stylesheet ' . $q . '.*php_weasyprint.*\.css' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+            ],
+
+            '5 - save the given stylesheet CSS string into a temporary file and pass that filename' => [
                 ['stylesheet' => 'html {font-size: 16px;}'],
                 '/emptyBinary --stylesheet ' . $q . '.*\.css' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
 
-            'save the content of the given attachment URL to a file and pass that filename' => [
+            '6 - save the content of the given attachment URL to a file and pass that filename' => [
                 ['attachment' => 'https://www.google.com/favicon.ico'],
-                '/emptyBinary --attachment ' . $q . '.*' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                '/emptyBinary --attachment ' . $q . '.*php_weasyprint.*\.temp' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
 
-            'save the content of multiple attachments URL to files and pass those filenames' => [
+            '7 - save the content of multiple attachments URL to files and pass those filenames' => [
                 ['attachment' => ['https://www.google.com/favicon.ico', 'https://github.githubassets.com/favicons/favicon.svg']],
-                '/emptyBinary --attachment ' . $q . '.*' . $q . ' --attachment ' . $q . '.*' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                '/emptyBinary --attachment ' . $q . '.*php_weasyprint.*\.temp' . $q . ' --attachment ' . $q . '.*php_weasyprint.*\.temp' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
         ];
     }

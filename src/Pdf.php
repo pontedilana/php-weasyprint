@@ -48,19 +48,44 @@ class Pdf extends AbstractGenerator
                 continue;
             }
 
-            if (!empty($value) && \array_key_exists($option, $this->optionsWithContentCheck)) {
-                $saveToTempFile = !$this->isFile($value) && !$this->isOptionUrl($value);
-                $fetchUrlContent = 'attachment' === $option && $this->isOptionUrl($value);
-
-                if ($saveToTempFile || $fetchUrlContent) {
-                    $fileContent = $fetchUrlContent ? \file_get_contents($value) : $value;
-                    $options[$option] = $this->createTemporaryFile($fileContent,
-                        $this->optionsWithContentCheck[$option]);
+            if ('attachment' === $option || 'stylesheet' === $option) {
+                $handledOption = $this->handleArrayOptions($option, $value);
+                if (count($handledOption) > 0) {
+                    $options[$option] = $handledOption;
                 }
             }
         }
 
         return $options;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return list<string>
+     */
+    private function handleArrayOptions(string $option, $value): array
+    {
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+
+        $returnOptions = [];
+        foreach ($value as $item) {
+            $saveToTempFile = !$this->isFile($item) && !$this->isOptionUrl($item);
+            $fetchUrlContent = 'attachment' === $option && $this->isOptionUrl($item);
+            if ($saveToTempFile || $fetchUrlContent) {
+                $fileContent = $fetchUrlContent ? \file_get_contents($item) : $item;
+                $returnOptions[] = $this->createTemporaryFile(
+                    $fileContent,
+                    $this->optionsWithContentCheck[$option] ?? 'temp'
+                );
+            } else {
+                $returnOptions[] = $item;
+            }
+        }
+
+        return $returnOptions;
     }
 
     /**
@@ -70,7 +95,7 @@ class Pdf extends AbstractGenerator
      */
     protected function isOptionUrl($option): bool
     {
-        return (bool)\filter_var($option, \FILTER_VALIDATE_URL);
+        return false !== \filter_var($option, \FILTER_VALIDATE_URL);
     }
 
     protected function configure(): void
