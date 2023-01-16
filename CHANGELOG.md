@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 1.0.0 - 2023-01-16
+### Fixed
+- Fixed handling of repeatable options (attachment and stylesheet)
+
+### Changed
+- Bump symfony/process up to ^6.2
+
+### Removed
+- Remove Image class
+- Remove Version class
+- Remove support for Symfony 4.4
+
 ## 0.13.0 - 2023-01-16
 ### Added
 - Support WeasyPrint 56 new options
