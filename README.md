@@ -1,14 +1,14 @@
 # PhpWeasyPrint
 
-PhpWeasyPrint is a PHP library allowing PDF generation from an URL or an HTML page.
+PhpWeasyPrint is a PHP library allowing PDF generation from a URL or an HTML page.
 It's a wrapper for [WeasyPrint](https://weasyprint.org/), a smart solution helping web developers to create PDF documents, available everywhere Python runs.
 
-You will have to download and install WeasyPrint to use PhpWeasyPrint (version 53 or greater is recommended).
+You will have to download and install WeasyPrint to use PhpWeasyPrint (version 56 or greater is recommended).
 
 This library is massively inspired by [KnpLabs/snappy](https://github.com/KnpLabs/snappy), of which it aims to be a one-to-one substitute (`GeneratorInterface` is the same).
 See "[Differences with Snappy](#differences-with-snappy)" section to see how the two differs
 
-## Installation using [Composer](http://getcomposer.org/)
+## Installation using [Composer](https://getcomposer.org/)
 
 ```bash
 $ composer require pontedilana/php-weasyprint
@@ -37,7 +37,7 @@ $pdf->setBinary('/usr/local/bin/weasyprint');
 ```php
 $pdf = new Pdf('/usr/local/bin/weasyprint');
 header('Content-Type: application/pdf');
-echo $pdf->getOutput('http://www.github.com');
+echo $pdf->getOutput('https://www.github.com');
 ```
 
 ### Download the pdf from the browser
@@ -46,7 +46,7 @@ echo $pdf->getOutput('http://www.github.com');
 $pdf = new Pdf('/usr/local/bin/weasyprint');
 header('Content-Type: application/pdf');
 header('Content-Disposition: attachment; filename="file.pdf"');
-echo $pdf->getOutput('http://www.github.com');
+echo $pdf->getOutput('https://www.github.com');
 ```
 
 ### Generate local pdf file
@@ -86,12 +86,12 @@ $pdf->resetOptions();
 Although PhpWeasyPrint and Snappy are interchangeable, there are a couple of differences between the two, due to WeasyPrint cli API:
 
 * WeasyPrint doesn't support multiple sources to be merged in one single output pdf, so only one input source (string or URL) is accepted in PhpWeasyPrint;
-* WeasyPrint version >= 53 doesn't generate images, so image generation from HTML string or URL is possible only with WeasyPrint lower versions (`Pontedilana\PhpWeasyPrint\Image` has been successfully tested with Weasyprint 52.5).
+* WeasyPrint version >= 53 doesn't generate images, so image generation from HTML string or URL is possible only with WeasyPrint lower versions and an unsupported PhpWeasyPrint version (`Pontedilana\PhpWeasyPrint\Image` has been successfully tested with Weasyprint 52.5 on PhpWeasyPrint 0.13.0).
 
 ## Bugs & Support
 
 If you found a bug please fill a [detailed issue](https://github.com/pontedilana/php-weasyprint/issues) with all the following points.
-If you need some help, please at least provide a complete reproducer so we could help you based on facts rather than assumptions.
+If you need some help, please at least provide a complete reproducer, so we could help you based on facts rather than assumptions.
 
 * OS and its version
 * WeasyPrint, its version and how you installed it
@@ -102,5 +102,5 @@ If your reproducer is big, please try to shrink it. It will help everyone to nar
 ## Credits
 
 PhpWeasyPrint has been originally developed by the [Pontedilana](https://www.pontedilana.it) dev team.  
-Snappy has been originally developed by the [KnpLabs](http://knplabs.com) team.
+Snappy has been originally developed by the [KnpLabs](https://knplabs.com) team.
 
