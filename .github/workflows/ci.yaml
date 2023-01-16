@@ -45,8 +45,8 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist
 
+      - name: Run PHPStan
+        run: phpstan --xdebug analyse src
+
       - name: Test with PHPUnit
         run: ./vendor/bin/phpunit
-
-      - name: Run PHPStan
-        run: phpstan analyse src
