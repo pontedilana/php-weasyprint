@@ -102,6 +102,7 @@ class PdfTest extends TestCase
         $testObject = new PdfSpy();
         $testObject->getOutputFromHtml('<html></html>', $options);
         $this->assertMatchesRegularExpression($expectedRegex, $testObject->getLastCommand());
+        // fwrite(STDERR, print_r($testObject->getLastCommand() . "\n\n", TRUE));
     }
 
     public function dataOptions(): array
@@ -109,32 +110,30 @@ class PdfTest extends TestCase
         $q = self::SHELL_ARG_QUOTE_REGEX;
 
         return [
-            // no options
             'no options' => [
                 [],
                 '/emptyBinary ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
-            // just pass a single stylesheet URL
-            'just pass a single stylesheet URL' => [
+
+            'pass a single stylesheet URL' => [
                 ['stylesheet' => 'https://google.com'],
                 '/emptyBinary --stylesheet ' . $q . 'https:\/\/google\.com' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
-            // just pass the given footer file
-            'just pass a single stylesheet file' => [
+
+            'pass a single stylesheet file' => [
                 ['stylesheet' => __DIR__ . '/../Fixture/style1.css'],
                 '/emptyBinary --stylesheet ' . $q . \preg_quote(__DIR__ . '/../Fixture/style1.css', '/') . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
-            // save the given stylesheet CSS string into a temporary file and pass that filename
             'save the given stylesheet CSS string into a temporary file and pass that filename' => [
                 ['stylesheet' => 'html {font-size: 16px;}'],
                 '/emptyBinary --stylesheet ' . $q . '.*\.css' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
-            // save the content of the given attachment URL to a file and pass that filename
+
             'save the content of the given attachment URL to a file and pass that filename' => [
                 ['attachment' => 'https://www.google.com/favicon.ico'],
                 '/emptyBinary --attachment ' . $q . '.*' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
-            // save the content of multiple attachments URL to files and pass those filenames
+
             'save the content of multiple attachments URL to files and pass those filenames' => [
                 ['attachment' => ['https://www.google.com/favicon.ico', 'https://github.githubassets.com/favicons/favicon.svg']],
                 '/emptyBinary --attachment ' . $q . '.*' . $q . ' --attachment ' . $q . '.*' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
@@ -153,8 +152,10 @@ class PdfTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
-        $this->assertFileExists(\reset($pdf->temporaryFiles));
+        $file = \reset($pdf->temporaryFiles);
+        $this->assertIsNotBool($file);
+        $this->assertFileExists($file);
         $pdf->__destruct();
-        $this->assertFileDoesNotExist(\reset($pdf->temporaryFiles));
+        $this->assertFileDoesNotExist($file);
     }
 }
