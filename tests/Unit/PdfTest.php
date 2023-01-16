@@ -121,8 +121,8 @@ class PdfTest extends TestCase
             ],
             // just pass the given footer file
             'just pass a single stylesheet file' => [
-                ['stylesheet' => __FILE__],
-                '/emptyBinary --stylesheet ' . $q . \preg_quote(__FILE__, '/') . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                ['stylesheet' => __DIR__ . '/../Fixture/style1.css'],
+                '/emptyBinary --stylesheet ' . $q . \preg_quote(__DIR__ . '/../Fixture/style1.css', '/') . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
             // save the given stylesheet CSS string into a temporary file and pass that filename
             'save the given stylesheet CSS string into a temporary file and pass that filename' => [
