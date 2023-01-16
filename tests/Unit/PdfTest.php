@@ -1,14 +1,10 @@
 <?php
 
-namespace Tests\Unit\Pontedilana\PhpWeasyPrint;
+namespace Pontedilana\PhpWeasyPrint\Tests\Unit;
 
-use CallbackFilterIterator;
-use DirectoryIterator;
-use FilesystemIterator;
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\Pdf;
-use RecursiveDirectoryIterator;
-use ReflectionMethod;
+use Pontedilana\PhpWeasyPrint\Tests\PdfSpy;
 
 /**
  * @covers \Pontedilana\PhpWeasyPrint\Pdf
@@ -22,9 +18,9 @@ class PdfTest extends TestCase
         $directory = __DIR__ . '/i-dont-exist';
 
         if (\file_exists($directory)) {
-            $iterator = new RecursiveDirectoryIterator(
+            $iterator = new \RecursiveDirectoryIterator(
                 $directory,
-                FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS
+                \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS
             );
 
             foreach ($iterator as $item) {
@@ -34,8 +30,8 @@ class PdfTest extends TestCase
             \rmdir($directory);
         }
 
-        $htmlFiles = new CallbackFilterIterator(
-            new DirectoryIterator(__DIR__),
+        $htmlFiles = new \CallbackFilterIterator(
+            new \DirectoryIterator(__DIR__),
             function ($filename) {
                 return 1 === \preg_match('/\.html$/', $filename);
             }
@@ -89,7 +85,7 @@ class PdfTest extends TestCase
     public function testRemovesLocalFilesOnError(): void
     {
         $pdf = new PdfSpy();
-        $method = new ReflectionMethod($pdf, 'createTemporaryFile');
+        $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
         $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
@@ -153,50 +149,12 @@ class PdfTest extends TestCase
     public function testRemovesLocalFilesOnDestruct(): void
     {
         $pdf = new PdfSpy();
-        $method = new ReflectionMethod($pdf, 'createTemporaryFile');
+        $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
         $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
         $this->assertFileExists(\reset($pdf->temporaryFiles));
         $pdf->__destruct();
         $this->assertFileDoesNotExist(\reset($pdf->temporaryFiles));
-    }
-}
-
-class PdfSpy extends Pdf
-{
-    /**
-     * @var string
-     */
-    private $lastCommand;
-
-    public function __construct()
-    {
-        parent::__construct('emptyBinary');
-    }
-
-    public function getLastCommand(): string
-    {
-        return $this->lastCommand;
-    }
-
-    public function getOutput($input, array $options = []): string
-    {
-        $filename = $this->createTemporaryFile(null, $this->getDefaultExtension());
-        $this->generate($input, $filename, $options, true);
-
-        return 'output';
-    }
-
-    protected function executeCommand(string $command): array
-    {
-        $this->lastCommand = $command;
-
-        return [0, 'output', 'errorOutput'];
-    }
-
-    protected function checkOutput(string $output, string $command): void
-    {
-        //let's say everything went right
     }
 }

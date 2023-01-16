@@ -1,14 +1,18 @@
 <?php
 
-namespace Tests\Unit\Pontedilana\PhpWeasyPrint;
+namespace Pontedilana\PhpWeasyPrint\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\Version;
 
+/**
+ * @deprecated 1.0.0 Version class is deprecated and will be removed
+ */
 class VersionTest extends TestCase
 {
     /**
      * @dataProvider dataVersions
+     *
      * @covers \Pontedilana\PhpWeasyPrint\Version::parseOutput
      * @covers \Pontedilana\PhpWeasyPrint\Version::__construct
      */

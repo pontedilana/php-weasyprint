@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 0.13.0 - 2023-01-16
+### Added
+- Support WeasyPrint 56 new options
+
+### Deprecated
+- Deprecate image generator
+- Deprecate Version class
+
 ## 0.12.0 - 2022-12-09
 ### Changed
 - Add support for PHP 8.2

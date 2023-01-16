@@ -1,12 +1,11 @@
 includes:
     - phpstan-baseline.neon
-    - vendor/phpstan/phpstan-phpunit/extension.neon
 
 parameters:
     level: 8
     paths:
         - src/
         - tests/
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
     inferPrivatePropertyTypeFromConstructor: true
-    reportUnmatchedIgnoredErrors: false
     checkMissingIterableValueType: false

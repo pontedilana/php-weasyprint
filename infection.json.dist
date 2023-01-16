@@ -9,10 +9,7 @@
         "summary": ".infection/summary.log",
         "json": ".infection/infection-log.json",
         "perMutator": ".infection/per-mutator.md",
-        "github": true,
-        "badge": {
-            "branch": "main"
-        }
+        "github": true
     },
     "minMsi": 84,
     "minCoveredMsi": 89.7

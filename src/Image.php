@@ -8,6 +8,8 @@ use Pontedilana\PhpWeasyPrint\Exception\UnsupportedWeasyPrintVersionException;
  * Use this class to create a snapshot / thumbnail from an HTML page.
  *
  * @author  Manuel Dalla Lana <manuel@pontedilana.it>
+ *
+ * @deprecated 1.0.0 WeasyPrint version 53 has deprecated image generation
  */
 class Image extends AbstractGenerator
 {
@@ -30,14 +32,14 @@ class Image extends AbstractGenerator
             // Global options
             'format' => 'png', // forced to 'png', should not be overridden
             'encoding' => null,
-            'stylesheet' => [], //repeatable
+            'stylesheet' => [], // repeatable
             'media-type' => null,
-            'resolution' => null, //png only
+            'resolution' => null, // png only
             'base-url' => null,
-            'attachment' => [], //repeatable
+            'attachment' => [], // repeatable
             'presentational-hints' => null,
             'optimize-images' => null, // deprecated in 53.0b2
-            'optimize-size' => null, //from 53.0b2
+            'optimize-size' => null, // from 53.0b2
         ]);
     }
 

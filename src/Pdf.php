@@ -9,6 +9,9 @@ namespace Pontedilana\PhpWeasyPrint;
  */
 class Pdf extends AbstractGenerator
 {
+    /**
+     * @var array<string, string>
+     */
     protected array $optionsWithContentCheck = [];
 
     /**
@@ -31,6 +34,11 @@ class Pdf extends AbstractGenerator
         parent::generate($input, $output, $options, $overwrite);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<string, mixed>
+     */
     protected function handleOptions(array $options = []): array
     {
         foreach ($options as $option => $value) {
@@ -70,15 +78,19 @@ class Pdf extends AbstractGenerator
         $this->addOptions([
             // Global options
             'encoding' => null,
-            'stylesheet' => [], //repeatable
+            'stylesheet' => [], // repeatable
             'media-type' => null,
             'base-url' => null,
-            'attachment' => [], //repeatable
+            'attachment' => [], // repeatable
             'presentational-hints' => null,
-            'optimize-size' => null, // added in 53.0b2
+            'optimize-size' => null, // added in WeasyPrint 53.0b2
+            'pdf-identifier' => null, // added in WeasyPrint 56.0b1
+            'pdf-variant' => null, // added in WeasyPrint 56.0b1
+            'pdf-version' => null, // added in WeasyPrint 56.0b1
+            'custom-metadata' => null, // added in WeasyPrint 56.0b1
             // Deprecated
-            'format' => null, // deprecated in 53.0b2
-            'optimize-images' => null, // deprecated in 53.0b2
+            'format' => null, // deprecated in WeasyPrint 53.0b2
+            'optimize-images' => null, // deprecated in WeasyPrint 53.0b2
             'resolution' => null, // deprecated - png only
         ]);
     }

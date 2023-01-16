@@ -21,6 +21,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",
+        "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^1.2",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^9.5"
@@ -32,7 +33,12 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Unit\\Pontedilana\\PhpWeasyPrint\\": "tests/Unit/"
+            "Pontedilana\\PhpWeasyPrint\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
         }
     },
     "scripts": {
