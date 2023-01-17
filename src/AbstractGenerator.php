@@ -89,8 +89,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
             $this->logger->error(\sprintf('An error happened while generating "%s".', $output), [
                 'command' => $command,
                 'status' => $status ?? null,
-                'stdout' => $stdout,
-                'stderr' => $stderr,
+                'stdout' => $stdout ?? null,
+                'stderr' => $stderr ?? null,
             ]);
 
             throw $e;

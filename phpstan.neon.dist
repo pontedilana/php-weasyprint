@@ -6,6 +6,5 @@ parameters:
     paths:
         - src/
         - tests/
-    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
     inferPrivatePropertyTypeFromConstructor: true
     checkMissingIterableValueType: false

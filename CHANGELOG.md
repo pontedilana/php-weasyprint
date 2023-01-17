@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 1.0.1 - 2023-01-17
+### Fixed
+- Fix logging of errors
+
 ## 1.0.0 - 2023-01-16
 ### Fixed
 - Fixed handling of repeatable options (attachment and stylesheet)
