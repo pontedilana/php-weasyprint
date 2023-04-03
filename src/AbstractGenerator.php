@@ -152,32 +152,34 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     protected function buildCommand(string $binary, string $input, string $output, array $options = []): string
     {
-        $command = $binary;
         $escapedBinary = \escapeshellarg($binary);
-        if (\is_executable($escapedBinary)) {
-            $command = $escapedBinary;
-        }
+        $command = \is_executable($escapedBinary) ? $escapedBinary : $binary;
 
         foreach ($options as $key => $option) {
-            if (null !== $option && false !== $option) {
-                if (true === $option) {
-                    $command .= ' --' . $key;
-                } elseif (\is_array($option)) {
-                    foreach ($option as $v) {
-                        $command .= ' --' . $key . ' ' . \escapeshellarg($v);
-                    }
-                } else {
-                    switch ($key) {
-                        case 'format':
-                            $command .= ' --' . $key . ' ' . $option;
-                            break;
-                        case 'resolution':
-                            $command .= ' --' . $key . ' ' . (int)$option;
-                            break;
-                        default:
-                            $command .= ' --' . $key . ' ' . \escapeshellarg($option);
-                            break;
-                    }
+            if (null === $option || false === $option) {
+                continue;
+            }
+
+            if (true === $option) {
+                $command .= ' --' . $key;
+                continue;
+            }
+
+            if (\is_array($option)) {
+                foreach ($option as $v) {
+                    $command .= ' --' . $key . ' ' . \escapeshellarg($v);
+                }
+            } else {
+                switch ($key) {
+                    case 'format':
+                        $command .= ' --' . $key . ' ' . $option;
+                        break;
+                    case 'resolution':
+                        $command .= ' --' . $key . ' ' . (int)$option;
+                        break;
+                    default:
+                        $command .= ' --' . $key . ' ' . \escapeshellarg((string)$option);
+                        break;
                 }
             }
         }
