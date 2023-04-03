@@ -13,16 +13,6 @@ class PdfTest extends TestCase
 {
     public const SHELL_ARG_QUOTE_REGEX = '(?:"|\')'; // escapeshellarg produces double quotes on Windows, single quotes otherwise
 
-    protected function setUp(): void
-    {
-        set_error_handler(
-            static function ($errno, $errstr) {
-                throw new \Exception($errstr, $errno);
-            },
-            \E_USER_ERROR
-        );
-    }
-
     protected function tearDown(): void
     {
         $directory = __DIR__ . '/i-dont-exist';
@@ -50,8 +40,6 @@ class PdfTest extends TestCase
         foreach ($htmlFiles as $file) {
             \unlink($file->getPathname());
         }
-
-        restore_error_handler();
     }
 
     /**
