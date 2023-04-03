@@ -112,6 +112,7 @@ class Pdf extends AbstractGenerator
             'pdf-identifier' => null, // added in WeasyPrint 56.0b1
             'pdf-variant' => null, // added in WeasyPrint 56.0b1
             'pdf-version' => null, // added in WeasyPrint 56.0b1
+            'pdf-forms' => null, // added in WeasyPrint 58.0b1
             'custom-metadata' => null, // added in WeasyPrint 56.0b1
             // Deprecated
             'format' => null, // deprecated in WeasyPrint 53.0b2
