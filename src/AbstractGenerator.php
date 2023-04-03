@@ -81,6 +81,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
             'timeout' => $this->timeout,
         ]);
 
+        $status = null;
+        $stdout = $stderr = '';
         try {
             [$status, $stdout, $stderr] = $this->executeCommand($command);
             $this->checkProcessStatus($status, $stdout, $stderr, $command);
@@ -88,9 +90,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         } catch (\Exception $e) {
             $this->logger->error(\sprintf('An error happened while generating "%s".', $output), [
                 'command' => $command,
-                'status' => $status ?? null,
-                'stdout' => $stdout ?? null,
-                'stderr' => $stderr ?? null,
+                'status' => $status,
+                'stdout' => $stdout,
+                'stderr' => $stderr,
             ]);
 
             throw $e;
