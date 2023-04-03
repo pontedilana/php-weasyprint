@@ -13,6 +13,16 @@ class PdfTest extends TestCase
 {
     public const SHELL_ARG_QUOTE_REGEX = '(?:"|\')'; // escapeshellarg produces double quotes on Windows, single quotes otherwise
 
+    protected function setUp(): void
+    {
+        set_error_handler(
+            static function ($errno, $errstr) {
+                throw new \Exception($errstr, $errno);
+            },
+            \E_USER_ERROR
+        );
+    }
+
     protected function tearDown(): void
     {
         $directory = __DIR__ . '/i-dont-exist';
@@ -40,6 +50,8 @@ class PdfTest extends TestCase
         foreach ($htmlFiles as $file) {
             \unlink($file->getPathname());
         }
+
+        restore_error_handler();
     }
 
     /**
@@ -89,8 +101,8 @@ class PdfTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
-        $this->expectError();
-        \trigger_error('test error', \E_USER_ERROR);
+        $this->expectException(\RuntimeException::class);
+        throw new \RuntimeException('Throw exception to cleanup files');
         $this->assertFileDoesNotExist(\reset($pdf->temporaryFiles));
     }
 
