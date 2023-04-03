@@ -31,13 +31,13 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     private ?array $env;
     private ?int $timeout = null;
 
-    /** @var array<string, mixed> */
+    /** @var array<string, bool|string|array|null> */
     private array $options = [];
     private ?string $binary = null;
 
     /**
-     * @param array<string, mixed>      $options
-     * @param array<string, mixed>|null $env
+     * @param array<string, bool|string|array|null> $options
+     * @param array<string, mixed>|null             $env
      */
     public function __construct(string $binary = null, array $options = [], array $env = null)
     {
@@ -81,6 +81,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
             'timeout' => $this->timeout,
         ]);
 
+        $status = null;
+        $stdout = $stderr = '';
         try {
             [$status, $stdout, $stderr] = $this->executeCommand($command);
             $this->checkProcessStatus($status, $stdout, $stderr, $command);
@@ -88,9 +90,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         } catch (\Exception $e) {
             $this->logger->error(\sprintf('An error happened while generating "%s".', $output), [
                 'command' => $command,
-                'status' => $status ?? null,
-                'stdout' => $stdout ?? null,
-                'stderr' => $stderr ?? null,
+                'status' => $status,
+                'stdout' => $stdout,
+                'stderr' => $stderr,
             ]);
 
             throw $e;
@@ -143,39 +145,41 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Builds the command string.
      *
-     * @param string               $binary  The binary path/name
-     * @param string               $input   Url or file location of the page to process
-     * @param string               $output  File location to the pdf-or-image-to-be
-     * @param array<string, mixed> $options An array of options
+     * @param string                                $binary  The binary path/name
+     * @param string                                $input   Url or file location of the page to process
+     * @param string                                $output  File location to the pdf-or-image-to-be
+     * @param array<string, bool|string|array|null> $options An array of options
      */
     protected function buildCommand(string $binary, string $input, string $output, array $options = []): string
     {
-        $command = $binary;
         $escapedBinary = \escapeshellarg($binary);
-        if (\is_executable($escapedBinary)) {
-            $command = $escapedBinary;
-        }
+        $command = \is_executable($escapedBinary) ? $escapedBinary : $binary;
 
         foreach ($options as $key => $option) {
-            if (null !== $option && false !== $option) {
-                if (true === $option) {
-                    $command .= ' --' . $key;
-                } elseif (\is_array($option)) {
-                    foreach ($option as $v) {
-                        $command .= ' --' . $key . ' ' . \escapeshellarg($v);
-                    }
-                } else {
-                    switch ($key) {
-                        case 'format':
-                            $command .= ' --' . $key . ' ' . $option;
-                            break;
-                        case 'resolution':
-                            $command .= ' --' . $key . ' ' . (int)$option;
-                            break;
-                        default:
-                            $command .= ' --' . $key . ' ' . \escapeshellarg($option);
-                            break;
-                    }
+            if (null === $option || false === $option) {
+                continue;
+            }
+
+            if (true === $option) {
+                $command .= ' --' . $key;
+                continue;
+            }
+
+            if (\is_array($option)) {
+                foreach ($option as $v) {
+                    $command .= ' --' . $key . ' ' . \escapeshellarg($v);
+                }
+            } else {
+                switch ($key) {
+                    case 'format':
+                        $command .= ' --' . $key . ' ' . $option;
+                        break;
+                    case 'resolution':
+                        $command .= ' --' . $key . ' ' . (int)$option;
+                        break;
+                    default:
+                        $command .= ' --' . $key . ' ' . \escapeshellarg((string)$option);
+                        break;
                 }
             }
         }
@@ -191,12 +195,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     protected function executeCommand(string $command): array
     {
-        $process = Process::fromShellCommandline($command, null, $this->env);
-
-        if (null !== $this->timeout) {
-            $process->setTimeout($this->timeout);
-        }
-
+        $process = Process::fromShellCommandline($command, null, $this->env, null, $this->timeout);
         $process->run();
 
         return [
@@ -277,9 +276,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Returns the command for the given input and output files.
      *
-     * @param string               $input   The input file
-     * @param string               $output  The ouput file
-     * @param array<string, mixed> $options An optional array of options that will be used only for this command
+     * @param string                                $input   The input file
+     * @param string                                $output  The ouput file
+     * @param array<string, bool|string|array|null> $options An optional array of options that will be used only for this command
      */
     public function getCommand(string $input, string $output, array $options = []): string
     {
@@ -360,8 +359,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Sets an option. Be aware that option values are NOT validated and that
      * it is your responsibility to validate user inputs.
      *
-     * @param string $name  The option to set
-     * @param mixed  $value The value (NULL to unset)
+     * @param string                 $name  The option to set
+     * @param bool|string|array|null $value The value (NULL to unset)
      *
      * @throws \InvalidArgumentException
      */
@@ -381,7 +380,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Sets an array of options.
      *
-     * @param array<string, mixed> $options An associative array of options as name/value
+     * @param array<string, bool|string|array|null> $options An associative array of options as name/value
      */
     public function setOptions(array $options): self
     {
@@ -395,7 +394,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Returns all the options.
      *
-     * @return array<string, mixed>
+     * @return array<string, bool|string|array|null>
      */
     public function getOptions(): array
     {
@@ -405,8 +404,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Adds an option.
      *
-     * @param string $name    The name
-     * @param mixed  $default An optional default value
+     * @param string                 $name    The name
+     * @param bool|string|array|null $default An optional default value
      *
      * @throws \InvalidArgumentException
      */
@@ -424,7 +423,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Adds an array of options.
      *
-     * @param array<string, mixed> $options
+     * @param array<string, bool|string|array|null> $options
      */
     protected function addOptions(array $options): self
     {
@@ -439,9 +438,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Merges the given array of options to the instance options and returns
      * the result options array. It does NOT change the instance options.
      *
-     * @param array<string, mixed> $options
+     * @param array<string, bool|string|array|null> $options
      *
-     * @return array<string, mixed>
+     * @return array<string, bool|string|array|null>
      *
      * @throws \InvalidArgumentException
      */

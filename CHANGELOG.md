@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 1.1.0 - 2023-04-03
+### Added
+- Support WeasyPrint 58 new option (--pdf-forms)
+### Changed
+- Always pass through timeout when creating a process (#7)
+
 ## 1.0.1 - 2023-01-17
 ### Fixed
 - Fix logging of errors

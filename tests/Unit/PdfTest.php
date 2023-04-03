@@ -89,8 +89,8 @@ class PdfTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
-        $this->expectError();
-        \trigger_error('test error', \E_USER_ERROR);
+        $this->expectException(\RuntimeException::class);
+        throw new \RuntimeException('Throw exception to cleanup files');
         $this->assertFileDoesNotExist(\reset($pdf->temporaryFiles));
     }
 
