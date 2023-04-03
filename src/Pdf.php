@@ -35,9 +35,9 @@ class Pdf extends AbstractGenerator
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param array<string, bool|string|array|null> $options
      *
-     * @return array<string, mixed>
+     * @return array<string, bool|string|array|null>
      */
     protected function handleOptions(array $options = []): array
     {
