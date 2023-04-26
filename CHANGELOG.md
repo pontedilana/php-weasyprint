@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 1.1.1 - 2023-04-27
+### Security
+- Implement countermeasures for CVE-2023-28115
+
 ## 1.1.0 - 2023-04-03
 ### Added
 - Support WeasyPrint 58 new option (--pdf-forms)

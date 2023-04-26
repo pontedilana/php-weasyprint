@@ -217,6 +217,10 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     protected function prepareOutput(string $filename, bool $overwrite): void
     {
+        if (0 === \strpos($filename, 'phar://')) {
+            throw new \InvalidArgumentException('The output file cannot be a phar archive.');
+        }
+
         $directory = \dirname($filename);
 
         if ($this->fileExists($filename)) {
