@@ -108,16 +108,22 @@ class Pdf extends AbstractGenerator
             'base-url' => null,
             'attachment' => [], // repeatable
             'presentational-hints' => null,
-            'optimize-size' => null, // added in WeasyPrint 53.0b2
             'pdf-identifier' => null, // added in WeasyPrint 56.0b1
             'pdf-variant' => null, // added in WeasyPrint 56.0b1
             'pdf-version' => null, // added in WeasyPrint 56.0b1
             'pdf-forms' => null, // added in WeasyPrint 58.0b1
             'custom-metadata' => null, // added in WeasyPrint 56.0b1
+            'uncompressed-pdf' => null, // added in WeasyPrint 59.0b1
+            'full-fonts' => null, // added in WeasyPrint 59.0b1
+            'hinting' => null, // added in WeasyPrint 59.0b1
+            'dpi' => null, // added in WeasyPrint 59.0b1
+            'jpeg-quality' => null, // added in WeasyPrint 59.0b1
+            'optimize-images' => null, // no longer deprecated in WeasyPrint 59.0b1
+            'cache-folder' => null, // added in WeasyPrint 59.0b1
             // Deprecated
             'format' => null, // deprecated in WeasyPrint 53.0b2
-            'optimize-images' => null, // deprecated in WeasyPrint 53.0b2
             'resolution' => null, // deprecated - png only
+            'optimize-size' => null, // added in WeasyPrint 53.0b2, deprecated in 59.0b1
         ]);
     }
 
