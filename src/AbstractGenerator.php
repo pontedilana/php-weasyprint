@@ -506,7 +506,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     protected function checkProcessStatus(?int $status, string $stdout, string $stderr, string $command): void
     {
         if (null === $status) {
-            throw new \RuntimeException(sprintf('The command is not terminated.' . "\n" . 'stderr: "%s"' . "\n" . 'stdout: "%s"' . "\n" . 'command: %s', $stderr, $stdout, $command));
+            throw new \RuntimeException(\sprintf('The command is not terminated.' . "\n" . 'stderr: "%s"' . "\n" . 'stdout: "%s"' . "\n" . 'command: %s', $stderr, $stdout, $command));
         }
 
         if (0 !== $status && '' !== $stderr) {

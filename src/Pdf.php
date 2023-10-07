@@ -50,7 +50,7 @@ class Pdf extends AbstractGenerator
 
             if ('attachment' === $option || 'stylesheet' === $option) {
                 $handledOption = $this->handleArrayOptions($option, $value);
-                if (count($handledOption) > 0) {
+                if (\count($handledOption) > 0) {
                     $options[$option] = $handledOption;
                 }
             }
@@ -66,7 +66,7 @@ class Pdf extends AbstractGenerator
      */
     private function handleArrayOptions(string $option, $value): array
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $value = [$value];
         }
 

@@ -32,7 +32,7 @@ class PdfTest extends TestCase
 
         $htmlFiles = new \CallbackFilterIterator(
             new \DirectoryIterator(__DIR__),
-            function ($filename) {
+            function($filename) {
                 return 1 === \preg_match('/\.html$/', $filename);
             }
         );

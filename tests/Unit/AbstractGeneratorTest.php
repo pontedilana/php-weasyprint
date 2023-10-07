@@ -910,7 +910,7 @@ class AbstractGeneratorTest extends TestCase
 
     /**
      * test against CVE-2023-28115
-     * fix and test by @AntoineLelaisant
+     * fix and test by @AntoineLelaisant.
      */
     public function testFailingGenerateWithOutputContainingPharPrefix(): void
     {
