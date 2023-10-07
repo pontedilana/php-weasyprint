@@ -50,7 +50,7 @@ class Pdf extends AbstractGenerator
 
             if ('attachment' === $option || 'stylesheet' === $option) {
                 $handledOption = $this->handleArrayOptions($option, $value);
-                if (count($handledOption) > 0) {
+                if (\count($handledOption) > 0) {
                     $options[$option] = $handledOption;
                 }
             }
@@ -66,7 +66,7 @@ class Pdf extends AbstractGenerator
      */
     private function handleArrayOptions(string $option, $value): array
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $value = [$value];
         }
 
@@ -120,6 +120,7 @@ class Pdf extends AbstractGenerator
             'jpeg-quality' => null, // added in WeasyPrint 59.0b1
             'optimize-images' => null, // no longer deprecated in WeasyPrint 59.0b1
             'cache-folder' => null, // added in WeasyPrint 59.0b1
+            'timeout' => null, // added in WeasyPrint 60.0
             // Deprecated
             'format' => null, // deprecated in WeasyPrint 53.0b2
             'resolution' => null, // deprecated - png only
