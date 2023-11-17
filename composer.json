@@ -15,9 +15,9 @@
         }
     ],
     "require": {
-        "php": "7.4.* || 8.0.* || 8.1.* || 8.2.*",
+        "php": "7.4.* || 8.0.* || 8.1.* || 8.2.* || 8.3.*",
         "psr/log": "^1.1 || ^2.0 || ^3.0",
-        "symfony/process": "^5.4 || ^6.2"
+        "symfony/process": "^5.4 || ^6.2  || ^7"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",
