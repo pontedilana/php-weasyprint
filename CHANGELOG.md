@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 1.4.0 - 2023-11-20
+### Changed
+- Added support for Symfony 7.0 and PHP 8.3
+
 ## 1.3.0 - 2023-10-07
 ### Added
 - Support WeasyPrint 60.0 new option
