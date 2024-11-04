@@ -15,14 +15,14 @@
         }
     ],
     "require": {
-        "php": "7.4.* || 8.0.* || 8.1.* || 8.2.* || 8.3.*",
+        "php": "7.4.* || 8.0.* || 8.1.* || 8.2.* || 8.3.* || 8.4.*",
         "psr/log": "^1.1 || ^2.0 || ^3.0",
-        "symfony/process": "^5.4 || ^6.2  || ^7"
+        "symfony/process": "^5.4 || ^6.2 || ^7"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",
         "phpstan/extension-installer": "^1.1",
-        "phpstan/phpstan": "^1.2",
+        "phpstan/phpstan": "^1.12",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^9.5"
     },

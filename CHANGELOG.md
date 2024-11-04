@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 ## Unreleased
 ### Added
 - Support WeasyPrint 63.0 new `srgb` option
+- Added support for PHP 8.4
 
 ## 1.4.0 - 2023-11-20
 ### Changed

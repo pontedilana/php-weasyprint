@@ -17,7 +17,7 @@ class Pdf extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    public function __construct(string $binary = null, array $options = [], array $env = null)
+    public function __construct(?string $binary = null, array $options = [], ?array $env = null)
     {
         $this->setDefaultExtension('pdf');
         $this->setOptionsWithContentCheck();
