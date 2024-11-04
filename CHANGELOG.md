@@ -6,13 +6,18 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 1.5.0 - 2024-11-04
+### Added
+- Support WeasyPrint 63.0 new `srgb` option
+- Added support for PHP 8.4
+
 ## 1.4.0 - 2023-11-20
 ### Changed
 - Added support for Symfony 7.0 and PHP 8.3
 
 ## 1.3.0 - 2023-10-07
 ### Added
-- Support WeasyPrint 60.0 new option
+- Support WeasyPrint 60.0 new `timeout` option
 
 ## 1.2.0 - 2023-05-11
 ### Added

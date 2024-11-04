@@ -63,8 +63,8 @@ $pdf->generateFromHtml('<h1>Bill</h1><p>You owe me money, dude.</p>', '/tmp/bill
 $pdf = new Pdf('/usr/local/bin/weasyprint');
 $pdf->setOption('encoding', 'utf8');
 $pdf->setOption('media-type', 'screen');
-$pdf->setOption('presentational-hints');
-$pdf->setOption('optimize-size', 'all');
+$pdf->setOption('presentational-hints', true);
+$pdf->setOption('optimize-images', true);
 $pdf->setOption('stylesheet', ['/path/to/first-style.css', '/path/to/second-style.css']);
 $pdf->setOption('attachment', ['/path/to/image.png', '/path/to/logo.jpg']);
 ```
@@ -83,7 +83,7 @@ $pdf->resetOptions();
 
 ## Differences with Snappy
 
-Although PhpWeasyPrint and Snappy are interchangeable, there are a couple of differences between the two, due to WeasyPrint cli API:
+Although PhpWeasyPrint and Snappy are interchangeable, there are a couple of differences between the two, due to WeasyPrint CLI API:
 
 * WeasyPrint doesn't support multiple sources to be merged in one single output pdf, so only one input source (string or URL) is accepted in PhpWeasyPrint;
 * WeasyPrint version >= 53 doesn't generate images, so image generation from HTML string or URL is possible only with WeasyPrint lower versions and an unsupported PhpWeasyPrint version (`Pontedilana\PhpWeasyPrint\Image` has been successfully tested with Weasyprint 52.5 on PhpWeasyPrint 0.13.0).
