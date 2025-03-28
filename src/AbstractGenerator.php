@@ -253,6 +253,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     public function setTimeout(?int $timeout): self
     {
         $this->timeout = $timeout;
+        $this->options['timeout'] = $timeout;
 
         return $this;
     }
