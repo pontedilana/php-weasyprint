@@ -34,6 +34,14 @@ class Pdf extends AbstractGenerator
         parent::generate($input, $output, $options, $overwrite);
     }
 
+    public function setTimeout(?int $timeout): self
+    {
+        parent::setTimeout($timeout);
+        $this->setOption('timeout', $timeout);
+
+        return $this;
+    }
+
     /**
      * @param array<string, bool|int|string|array|null> $options
      *

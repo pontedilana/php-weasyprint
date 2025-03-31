@@ -176,6 +176,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
                         $command .= ' --' . $key . ' ' . $option;
                         break;
                     case 'resolution':
+                    case 'timeout':
                         $command .= ' --' . $key . ' ' . (int)$option;
                         break;
                     default:
@@ -254,7 +255,6 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     public function setTimeout(?int $timeout): self
     {
         $this->timeout = $timeout;
-        $this->options['timeout'] = $timeout;
 
         return $this;
     }
