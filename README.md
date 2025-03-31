@@ -81,6 +81,40 @@ $pdf->setOption('media-type', 'screen');
 $pdf->resetOptions();
 ```
 
+### Timeouts
+
+A default timeout of 10 seconds is set for the WeasyPrint process to prevent orphaned or hanging processes.  
+This is a defensive measure that applies in most cases and helps ensure system stability.
+
+You can change the timeout with the `setTimeout()` method:
+
+```php
+$pdf = new Pdf('/usr/local/bin/weasyprint');
+$pdf->setTimeout(30); // 30 seconds
+```
+
+The timeout can be disabled entirely using either of the following:
+
+```php
+$pdf->setTimeout(null);
+// or
+$pdf->disableTimeout();
+```
+
+This is especially useful if you're running inside a *queue worker*, *job runner*, or other environments that already handle timeouts (e.g. Symfony Messenger, Laravel Queue, Supervisor).  
+Disabling the internal timeout in those cases avoids conflicts with higher-level timeout strategies.
+
+> **Note:**  
+> The `setTimeout()` method affects **both**:
+> - how long the process is allowed to run before being forcibly stopped, and
+> - the `--timeout` option passed to the WeasyPrint command-line tool.
+>
+> If you only want to disable WeasyPrint's own timeout (while keeping the execution time limit), use:
+>
+> ```php
+> $pdf->setOption('timeout', null);
+> ```
+
 ## Differences with Snappy
 
 Although PhpWeasyPrint and Snappy are interchangeable, there are a couple of differences between the two, due to WeasyPrint CLI API:

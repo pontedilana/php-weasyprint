@@ -38,6 +38,21 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * @param array<string, bool|int|string|array|null> $options
      * @param array<string, mixed>|null                 $env
+     *
+     * @note
+     *  This class sets a default timeout on the process to prevent
+     *  orphaned or hanging processes. This is a defensive measure that applies
+     *  in most cases.
+     *
+     *  If you run this inside a queue worker, job runner, or any environment
+     *  that already handles timeouts (e.g. Symfony Messenger, Laravel Queue),
+     *  you can disable the internal timeout using:
+     *
+     *      $generator->disableTimeout();
+     *  or
+     *      $generator->setTimeout(null);
+     *
+     *  This ensures no conflicts with higher-level timeout strategies.
      */
     public function __construct(?string $binary = null, array $options = [], ?array $env = null)
     {
@@ -171,18 +186,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
                     $command .= ' --' . $key . ' ' . \escapeshellarg($v);
                 }
             } else {
-                switch ($key) {
-                    case 'format':
-                        $command .= ' --' . $key . ' ' . $option;
-                        break;
-                    case 'resolution':
-                    case 'timeout':
-                        $command .= ' --' . $key . ' ' . (int)$option;
-                        break;
-                    default:
-                        $command .= ' --' . $key . ' ' . \escapeshellarg((string)$option);
-                        break;
-                }
+                $command .= ' --' . $key . ' ' . \escapeshellarg((string)$option);
             }
         }
 
@@ -257,6 +261,11 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         $this->timeout = $timeout;
 
         return $this;
+    }
+
+    public function disableTimeout(): self
+    {
+        return $this->setTimeout(null);
     }
 
     /**

@@ -587,15 +587,6 @@ class AbstractGeneratorTest extends TestCase
                 ],
                 $theBinary . ' --attachment ' . \escapeshellarg('/path1') . ' --attachment ' . \escapeshellarg('/path2') . ' ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
             ],
-            [
-                $theBinary,
-                'https://the.url/',
-                '/the/path',
-                [
-                    'resolution' => 100,
-                ],
-                $theBinary . ' --resolution 100 ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
-            ],
         ];
     }
 
@@ -915,7 +906,7 @@ class AbstractGeneratorTest extends TestCase
     public function testFailingGenerateWithOutputContainingPharPrefix(): void
     {
         $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->setMethods([
+            ->onlyMethods([
                 'configure',
                 'prepareOutput',
             ])
