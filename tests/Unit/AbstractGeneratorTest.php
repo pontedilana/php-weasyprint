@@ -893,7 +893,7 @@ class AbstractGeneratorTest extends TestCase
             return null;
         }
 
-        $paths = \explode(\PATH_SEPARATOR, \getenv('PATH'));
+        $paths = \explode(\PATH_SEPARATOR, \getenv('PATH') ?: '');
         foreach ($paths as $path) {
             // we need this for XAMPP (Windows)
             if (false !== \strpos($path, 'php.exe') && isset($_SERVER['WINDIR']) && \file_exists($path) && \is_file($path)) {

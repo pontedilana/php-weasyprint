@@ -1,5 +1,5 @@
-includes:
-	- phpstan-baseline.neon
+#includes:
+#	- phpstan-baseline.neon
 
 parameters:
 	level: 8
@@ -7,5 +7,6 @@ parameters:
 		- src/
 		- tests/
 	inferPrivatePropertyTypeFromConstructor: true
+	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
 		- identifier: missingType.iterableValue

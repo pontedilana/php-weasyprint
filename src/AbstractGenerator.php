@@ -31,13 +31,13 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     private ?array $env;
     private ?int $timeout = null;
 
-    /** @var array<string, bool|string|array|null> */
+    /** @var array<string, bool|int|string|array|null> */
     private array $options = [];
     private ?string $binary = null;
 
     /**
-     * @param array<string, bool|string|array|null> $options
-     * @param array<string, mixed>|null             $env
+     * @param array<string, bool|int|string|array|null> $options
+     * @param array<string, mixed>|null                 $env
      */
     public function __construct(?string $binary = null, array $options = [], ?array $env = null)
     {
@@ -45,10 +45,11 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
 
         $this->logger = new NullLogger();
         $this->setBinary($binary);
-        $this->setOptions($options);
         $this->setTimeout(self::DEFAULT_TIMEOUT);
+        $this->setOptions($options);
         $this->env = empty($env) ? null : $env;
 
+        /** @phpstan-ignore-next-line */
         if (\is_callable([$this, 'removeTemporaryFiles'])) {
             \register_shutdown_function([$this, 'removeTemporaryFiles']);
         }
@@ -145,10 +146,10 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Builds the command string.
      *
-     * @param string                                $binary  The binary path/name
-     * @param string                                $input   Url or file location of the page to process
-     * @param string                                $output  File location to the pdf-or-image-to-be
-     * @param array<string, bool|string|array|null> $options An array of options
+     * @param string                                    $binary  The binary path/name
+     * @param string                                    $input   Url or file location of the page to process
+     * @param string                                    $output  File location to the pdf-or-image-to-be
+     * @param array<string, bool|int|string|array|null> $options An array of options
      */
     protected function buildCommand(string $binary, string $input, string $output, array $options = []): string
     {
@@ -281,9 +282,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Returns the command for the given input and output files.
      *
-     * @param string                                $input   The input file
-     * @param string                                $output  The ouput file
-     * @param array<string, bool|string|array|null> $options An optional array of options that will be used only for this command
+     * @param string                                    $input   The input file
+     * @param string                                    $output  The ouput file
+     * @param array<string, bool|int|string|array|null> $options An optional array of options that will be used only for this command
      */
     public function getCommand(string $input, string $output, array $options = []): string
     {
@@ -364,8 +365,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Sets an option. Be aware that option values are NOT validated and that
      * it is your responsibility to validate user inputs.
      *
-     * @param string                 $name  The option to set
-     * @param bool|string|array|null $value The value (NULL to unset)
+     * @param string                     $name  The option to set
+     * @param bool|int|string|array|null $value The value (NULL to unset)
      *
      * @throws \InvalidArgumentException
      */
@@ -385,7 +386,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Sets an array of options.
      *
-     * @param array<string, bool|string|array|null> $options An associative array of options as name/value
+     * @param array<string, bool|int|string|array|null> $options An associative array of options as name/value
      */
     public function setOptions(array $options): self
     {
@@ -399,7 +400,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Returns all the options.
      *
-     * @return array<string, bool|string|array|null>
+     * @return array<string, bool|int|string|array|null>
      */
     public function getOptions(): array
     {
@@ -409,8 +410,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Adds an option.
      *
-     * @param string                 $name    The name
-     * @param bool|string|array|null $default An optional default value
+     * @param string                     $name    The option name
+     * @param bool|int|string|array|null $default An optional default value
      *
      * @throws \InvalidArgumentException
      */
@@ -428,7 +429,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Adds an array of options.
      *
-     * @param array<string, bool|string|array|null> $options
+     * @param array<string, bool|int|string|array|null> $options
      */
     protected function addOptions(array $options): self
     {
@@ -443,9 +444,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Merges the given array of options to the instance options and returns
      * the result options array. It does NOT change the instance options.
      *
-     * @param array<string, bool|string|array|null> $options
+     * @param array<string, bool|int|string|array|null> $options
      *
-     * @return array<string, bool|string|array|null>
+     * @return array<string, bool|int|string|array|null>
      *
      * @throws \InvalidArgumentException
      */

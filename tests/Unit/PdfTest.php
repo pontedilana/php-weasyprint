@@ -48,6 +48,7 @@ class PdfTest extends TestCase
     public function testCreateInstance(): void
     {
         $testObject = new Pdf();
+        /** @phpstan-ignore-next-line */
         $this->assertInstanceOf(Pdf::class, $testObject);
     }
 
@@ -91,6 +92,7 @@ class PdfTest extends TestCase
         $this->assertCount(1, $pdf->temporaryFiles);
         $this->expectException(\RuntimeException::class);
         throw new \RuntimeException('Throw exception to cleanup files');
+        /** @phpstan-ignore-next-line */
         $this->assertFileDoesNotExist(\reset($pdf->temporaryFiles));
     }
 
