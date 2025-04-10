@@ -34,10 +34,26 @@ class Pdf extends AbstractGenerator
         parent::generate($input, $output, $options, $overwrite);
     }
 
+    public function setTimeout(?int $timeout): self
+    {
+        parent::setTimeout($timeout);
+        $this->setOption('timeout', $timeout);
+
+        return $this;
+    }
+
+    public function disableTimeout(): self
+    {
+        parent::disableTimeout();
+        $this->setOption('timeout', null);
+
+        return $this;
+    }
+
     /**
-     * @param array<string, bool|string|array|null> $options
+     * @param array<string, bool|int|string|array|null> $options
      *
-     * @return array<string, bool|string|array|null>
+     * @return array<string, bool|int|string|array|null>
      */
     protected function handleOptions(array $options = []): array
     {
@@ -127,6 +143,54 @@ class Pdf extends AbstractGenerator
             'resolution' => null, // deprecated - png only
             'optimize-size' => null, // added in WeasyPrint 53.0b2, deprecated in 59.0b1
         ]);
+    }
+
+    /**
+     * Builds the command string.
+     *
+     * @param string                                    $binary  The binary path/name
+     * @param string                                    $input   Url or file location of the page to process
+     * @param string                                    $output  File location to the pdf-or-image-to-be
+     * @param array<string, bool|int|string|array|null> $options An array of options
+     */
+    protected function buildCommand(string $binary, string $input, string $output, array $options = []): string
+    {
+        $escapedBinary = \escapeshellarg($binary);
+        $command = \is_executable($escapedBinary) ? $escapedBinary : $binary;
+
+        foreach ($options as $key => $option) {
+            if (null === $option || false === $option) {
+                continue;
+            }
+
+            if (true === $option) {
+                $command .= ' --' . $key;
+                continue;
+            }
+
+            if (\is_array($option)) {
+                foreach ($option as $v) {
+                    $command .= ' --' . $key . ' ' . \escapeshellarg($v);
+                }
+            } else {
+                switch ($key) {
+                    case 'format':
+                        $command .= ' --' . $key . ' ' . $option;
+                        break;
+                    case 'dpi':
+                    case 'jpeg-quality':
+                    case 'resolution':
+                    case 'timeout':
+                        $command .= ' --' . $key . ' ' . (int)$option;
+                        break;
+                    default:
+                        $command .= ' --' . $key . ' ' . \escapeshellarg((string)$option);
+                        break;
+                }
+            }
+        }
+
+        return $command . (' ' . \escapeshellarg($input) . ' ' . \escapeshellarg($output));
     }
 
     private function setOptionsWithContentCheck(): void
