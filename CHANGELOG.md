@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog(https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## 2.0.0 - 2025-04-10
 ### Added
 - Add `--timeout` option to the WeasyPrint command-line call by default. This improves consistency with the internal process timeout already applied by Symfony Process. If you're running WeasyPrint inside a worker, queue, or other timeout-managed environment, you can disable it using `$pdf->disableTimeout()` or `$pdf->setTimeout(null)`. (#15)
 - Add `disableTimeout()` method to easily disable the new CLI timeout behavior
