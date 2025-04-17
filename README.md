@@ -3,7 +3,7 @@
 PhpWeasyPrint is a PHP library allowing PDF generation from a URL or an HTML page.
 It's a wrapper for [WeasyPrint](https://weasyprint.org/), a smart solution helping web developers to create PDF documents, available everywhere Python runs.
 
-You will have to download and install WeasyPrint to use PhpWeasyPrint (version 56 or greater is recommended).
+You will have to download and install WeasyPrint to use PhpWeasyPrint (version 60 or greater is required).
 
 This library is massively inspired by [KnpLabs/snappy](https://github.com/KnpLabs/snappy), of which it aims to be a one-to-one substitute (`GeneratorInterface` is the same).
 See "[Differences with Snappy](#differences-with-snappy)" section to see how the two differs
