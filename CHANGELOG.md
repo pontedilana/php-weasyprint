@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.1.0 - 2025-07-24
+### Added
+- Support WeasyPrint 66.0 new `--pdf-tags` option
+
 ## 2.0.0 - 2025-04-10
 ### Added
 - Add `--timeout` option to the WeasyPrint command-line call by default. This improves consistency with the internal process timeout already applied by Symfony Process. If you're running WeasyPrint inside a worker, queue, or other timeout-managed environment, you can disable it using `$pdf->disableTimeout()` or `$pdf->setTimeout(null)`. (#15)
@@ -16,7 +20,7 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## 1.5.0 - 2024-11-04
 ### Added
-- Support WeasyPrint 63.0 new `srgb` option
+- Support WeasyPrint 63.0 new `--srgb` option
 - Add support for PHP 8.4
 
 ## 1.4.0 - 2023-11-20
@@ -25,7 +29,7 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## 1.3.0 - 2023-10-07
 ### Added
-- Support WeasyPrint 60.0 new `timeout` option
+- Support WeasyPrint 60.0 new `--timeout` option
 
 ## 1.2.0 - 2023-05-11
 ### Added
@@ -37,7 +41,7 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## 1.1.0 - 2023-04-03
 ### Added
-- Support WeasyPrint 58 new option (--pdf-forms)
+- Support WeasyPrint 58 new option (`--pdf-forms`)
 ### Changed
 - Always pass through timeout when creating a process (#7)
 
