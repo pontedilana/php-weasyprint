@@ -926,4 +926,17 @@ class AbstractGeneratorTest extends TestCase
 
         $media->generate('the_input_file', 'phar://the_output_file', ['foo' => 'bar']);
     }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::getCommand
+     */
+    public function testGetCommandThrowsExceptionWhenBinaryNotSet(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('You must define a binary prior to conversion.');
+
+        $media->getCommand('input.html', 'output.pdf');
+    }
 }

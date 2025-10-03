@@ -1,10 +1,46 @@
 name: CI
+
 on:
   - push
   - pull_request
+
+permissions:
+  contents: read
+
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  phpstan:
+    runs-on: ubuntu-24.04
+    name: PHPStan
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          tools: phpstan
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Run PHPStan
+        run: phpstan analyse src
+
+  phpunit:
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         php-version:
@@ -16,17 +52,16 @@ jobs:
           - "8.4"
           - "8.5"
 
-    name: PHP ${{ matrix.php-version }}
+    name: PHPUnit - PHP ${{ matrix.php-version }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Setup PHP, with composer and extensions
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: phpstan
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
@@ -47,9 +82,6 @@ jobs:
 
       - name: Install dependencies
         run: composer install --no-progress --prefer-dist --optimize-autoloader
-
-      - name: Run PHPStan
-        run: phpstan analyse src
 
       - name: Test with PHPUnit
         run: ./vendor/bin/phpunit
