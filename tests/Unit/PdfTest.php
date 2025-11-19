@@ -161,6 +161,16 @@ class PdfTest extends TestCase
         ];
     }
 
+    public function testSetTimeoutConfiguresBothProcessAndWeasyPrintTimeout(): void
+    {
+        $testObject = new PdfSpy();
+        $testObject->setTimeout(30);
+        $testObject->getOutputFromHtml('<html></html>');
+
+        // Verify that --timeout 30 is in the command
+        $this->assertMatchesRegularExpression('/--timeout 30/', $testObject->getLastCommand());
+    }
+
     public function testDisableTimeout(): void
     {
         $testObject = new PdfSpy();
