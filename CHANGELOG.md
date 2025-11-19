@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.2.0 - 2025-11-19
+### Added
+- Support PHP 8.5
+- More tests
+
 ## 2.1.0 - 2025-07-24
 ### Added
 - Support WeasyPrint 66.0 new `--pdf-tags` option
