@@ -87,7 +87,7 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
-        $method->setAccessible(true);
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
         $this->expectException(\RuntimeException::class);
@@ -197,7 +197,7 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
-        $method->setAccessible(true);
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
         $file = \reset($pdf->temporaryFiles);
