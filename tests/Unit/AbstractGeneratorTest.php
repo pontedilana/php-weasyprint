@@ -939,4 +939,162 @@ class AbstractGeneratorTest extends TestCase
 
         $media->getCommand('input.html', 'output.pdf');
     }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::getFileContents
+     */
+    public function testGetFileContentsThrowsExceptionWhenFileCannotBeRead(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $this->expectException(\Pontedilana\PhpWeasyPrint\Exception\CouldNotReadFileContentException::class);
+        $this->expectExceptionMessage('Could not read file \'/nonexistent/path/to/file.txt\' content.');
+
+        $r = new \ReflectionMethod($media, 'getFileContents');
+        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
+
+        @$r->invokeArgs($media, ['/nonexistent/path/to/file.txt']);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::filesize
+     */
+    public function testFilesizeThrowsExceptionWhenSizeCannotBeRead(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $this->expectException(\Pontedilana\PhpWeasyPrint\Exception\CouldNotReadFileSizeException::class);
+        $this->expectExceptionMessage('Could not read file \'/nonexistent/path/to/file.txt\' size.');
+
+        $r = new \ReflectionMethod($media, 'filesize');
+        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
+
+        @$r->invokeArgs($media, ['/nonexistent/path/to/file.txt']);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setBinary
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::getBinary
+     */
+    public function testSetAndGetBinary(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $this->assertNull($media->getBinary(), '->getBinary() returns null by default');
+
+        $media->setBinary('/usr/bin/weasyprint');
+        $this->assertEquals('/usr/bin/weasyprint', $media->getBinary(), '->setBinary() sets the binary path');
+
+        $media->setBinary('/opt/weasyprint');
+        $this->assertEquals('/opt/weasyprint', $media->getBinary(), '->setBinary() updates the binary path');
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setTimeout
+     */
+    public function testSetTimeout(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $result = $media->setTimeout(2000);
+
+        $this->assertInstanceOf(AbstractGenerator::class, $result, '->setTimeout() returns the generator instance');
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::disableTimeout
+     */
+    public function testDisableTimeout(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $media->setTimeout(5000);
+        $result = $media->disableTimeout();
+
+        $this->assertInstanceOf(AbstractGenerator::class, $result, '->disableTimeout() returns the generator instance');
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setDefaultExtension
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::getDefaultExtension
+     */
+    public function testSetAndGetDefaultExtension(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $media->setDefaultExtension('pdf');
+        $this->assertEquals('pdf', $media->getDefaultExtension(), '->setDefaultExtension() sets the default extension');
+
+        $media->setDefaultExtension('png');
+        $this->assertEquals('png', $media->getDefaultExtension(), '->setDefaultExtension() updates the default extension');
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setTemporaryFolder
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::getTemporaryFolder
+     */
+    public function testSetAndGetTemporaryFolder(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $defaultTempFolder = $media->getTemporaryFolder();
+        $this->assertEquals(\sys_get_temp_dir(), $defaultTempFolder, '->getTemporaryFolder() returns system temp dir by default');
+
+        $media->setTemporaryFolder('/custom/temp');
+        $this->assertEquals('/custom/temp', $media->getTemporaryFolder(), '->setTemporaryFolder() sets the temporary folder');
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::getOptions
+     */
+    public function testGetOptions(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $options = $media->getOptions();
+        $this->assertIsArray($options, '->getOptions() returns an array');
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::executeCommand
+     */
+    public function testExecuteCommand(): void
+    {
+        $media = $this->getMockBuilder(AbstractGenerator::class)
+            ->onlyMethods(['configure'])
+            ->getMock()
+        ;
+
+        $r = new \ReflectionMethod($media, 'executeCommand');
+        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
+
+        // Execute a simple command that should succeed
+        $result = $r->invokeArgs($media, ['echo "test"']);
+
+        $this->assertIsArray($result, '->executeCommand() returns an array');
+        $this->assertCount(3, $result, '->executeCommand() returns an array with 3 elements [status, stdout, stderr]');
+        $this->assertEquals(0, $result[0], '->executeCommand() returns 0 exit code for successful command');
+        $this->assertStringContainsString('test', $result[1], '->executeCommand() returns stdout output');
+        $this->assertIsString($result[2], '->executeCommand() returns stderr as string');
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::executeCommand
+     */
+    public function testExecuteCommandWithFailure(): void
+    {
+        $media = $this->getMockBuilder(AbstractGenerator::class)
+            ->onlyMethods(['configure'])
+            ->getMock()
+        ;
+
+        $r = new \ReflectionMethod($media, 'executeCommand');
+        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
+
+        // Execute a command that should fail
+        $result = $r->invokeArgs($media, ['exit 1']);
+
+        $this->assertIsArray($result, '->executeCommand() returns an array');
+        $this->assertEquals(1, $result[0], '->executeCommand() returns non-zero exit code for failed command');
+    }
 }
