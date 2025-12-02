@@ -139,6 +139,7 @@ class Pdf extends AbstractGenerator
             'cache-folder' => null, // added in WeasyPrint 59.0b1
             'timeout' => null, // added in WeasyPrint 60.0
             'srgb' => null, // added in WeasyPrint 63.0
+            'allowed-protocols' => null, // added in WeasyPrint 67.0
             // Deprecated
             'format' => null, // deprecated in WeasyPrint 53.0b2
             'resolution' => null, // deprecated - png only
