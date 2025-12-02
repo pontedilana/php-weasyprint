@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.3.0 - 2025-12-02
+### Added
+- Support WeasyPrint 67.0 new `--allowed-protocols` option
+- Support Symfony 8.0
+- More tests
+
 ## 2.2.0 - 2025-11-19
 ### Added
 - Support PHP 8.5

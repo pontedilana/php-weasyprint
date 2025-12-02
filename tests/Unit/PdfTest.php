@@ -87,7 +87,7 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
-        $method->setAccessible(true);
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
         $this->expectException(\RuntimeException::class);
@@ -197,7 +197,7 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
-        $method->setAccessible(true);
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
         $file = \reset($pdf->temporaryFiles);
@@ -205,5 +205,44 @@ class PdfTest extends TestCase
         $this->assertFileExists($file);
         $pdf->__destruct();
         $this->assertFileDoesNotExist($file);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::buildCommand
+     */
+    public function testBuildCommandHandlesIntegerOptions(): void
+    {
+        $pdf = new PdfSpy();
+        $method = new \ReflectionMethod($pdf, 'buildCommand');
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
+
+        $command = $method->invoke($pdf, 'weasyprint', 'input.html', 'output.pdf', [
+            'dpi' => 300,
+            'jpeg-quality' => 85,
+            'timeout' => 60,
+            'resolution' => 100,
+        ]);
+
+        $this->assertStringContainsString('--dpi 300', $command);
+        $this->assertStringContainsString('--jpeg-quality 85', $command);
+        $this->assertStringContainsString('--timeout 60', $command);
+        $this->assertStringContainsString('--resolution 100', $command);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::buildCommand
+     */
+    public function testBuildCommandHandlesDeprecatedFormatOption(): void
+    {
+        $pdf = new PdfSpy();
+        $method = new \ReflectionMethod($pdf, 'buildCommand');
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
+
+        $command = $method->invoke($pdf, 'weasyprint', 'input.html', 'output.pdf', [
+            'format' => 'pdf',
+        ]);
+
+        // The format option should be passed without escaping (deprecated option)
+        $this->assertStringContainsString('--format pdf', $command);
     }
 }
