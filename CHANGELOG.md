@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.4.0 - 2026-01-20
+### Added
+- Support WeasyPrint 68.0 new `--attachment-relationship` and `--xmp-metadata` options
+
 ## 2.3.0 - 2025-12-02
 ### Added
 - Support WeasyPrint 67.0 new `--allowed-protocols` option

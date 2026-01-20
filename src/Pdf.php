@@ -140,6 +140,8 @@ class Pdf extends AbstractGenerator
             'timeout' => null, // added in WeasyPrint 60.0
             'srgb' => null, // added in WeasyPrint 63.0
             'allowed-protocols' => null, // added in WeasyPrint 67.0
+            'attachment-relationship' => null, // added in WeasyPrint 68.0
+            'xmp-metadata' => null, // added in WeasyPrint 68.0
             // Deprecated
             'format' => null, // deprecated in WeasyPrint 53.0b2
             'resolution' => null, // deprecated - png only
