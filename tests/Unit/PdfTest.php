@@ -158,6 +158,10 @@ class PdfTest extends TestCase
                 ['pdf-variant' => 'pdf/ua-1', 'dpi' => 300, 'timeout' => 60, 'srgb' => true, 'resolution' => 100],
                 "/emptyBinary --pdf-variant 'pdf\/ua-1' --dpi 300 --timeout 60 --srgb --resolution 100 " . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
+            '9 - new boolean options' => [
+                ['no-http-redirects' => true, 'fail-on-http-errors' => true, 'verbose' => true, 'debug' => true, 'info' => true, 'version' => true],
+                '/emptyBinary --timeout \d* --info --verbose --debug --version --no-http-redirects --fail-on-http-errors ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+            ],
         ];
     }
 
