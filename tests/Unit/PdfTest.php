@@ -160,7 +160,7 @@ class PdfTest extends TestCase
             ],
             '9 - new boolean options' => [
                 ['no-http-redirects' => true, 'fail-on-http-errors' => true, 'verbose' => true, 'debug' => true, 'info' => true, 'version' => true],
-                '/emptyBinary --timeout \d* --info --version --no-http-redirects --fail-on-http-errors --verbose --debug ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                '/emptyBinary --timeout \d* --info --verbose --debug --version --no-http-redirects --fail-on-http-errors ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
         ];
     }
