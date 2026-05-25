@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 ### Security
 - Fix potential SSRF and local file disclosure: option URLs are fetched server-side only when their scheme is allowed (`http`, `https` by default, configurable via the new `$allowedSchemes` constructor argument)
 - Fix potential arbitrary file deletion at shutdown: `removeTemporaryFiles()` now only deletes files located inside the temporary folder
+- Fix PHAR deserialization via the output filename (CVE-2023-28115 case-insensitive bypass): the output path is now validated against a scheme allow-list instead of a case-sensitive `phar://` check
 
 ## 2.5.1 - 2026-05-25
 ### Security

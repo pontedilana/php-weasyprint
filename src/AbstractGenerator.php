@@ -22,6 +22,11 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     public const DEFAULT_TIMEOUT = 10;
 
     /** @var list<string> */
+    protected const ALLOWED_PROTOCOLS = ['file'];
+
+    protected const WINDOWS_LOCAL_FILENAME_REGEX = '/^[a-z]:(?:[\\\\\/]?(?:[\w\s!#()-]+|[\.]{1,2})+)*[\\\\\/]?/i';
+
+    /** @var list<string> */
     public array $temporaryFiles = [];
     protected ?string $temporaryFolder = null;
     private LoggerInterface $logger;
@@ -237,8 +242,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     protected function prepareOutput(string $filename, bool $overwrite): void
     {
-        if (0 === \strpos($filename, 'phar://')) {
-            throw new \InvalidArgumentException('The output file cannot be a phar archive.');
+        if (!$this->isProtocolAllowed($filename)) {
+            throw new \InvalidArgumentException(\sprintf("The output file scheme is not supported. Expected one of ['%s'].", \implode("', '", self::ALLOWED_PROTOCOLS)));
         }
 
         $directory = \dirname($filename);
@@ -256,6 +261,34 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         } elseif (!$this->isDir($directory) && !$this->mkdir($directory)) {
             throw new \RuntimeException(\sprintf('The output file\'s directory \'%s\' could not be created.', $directory));
         }
+    }
+
+    /**
+     * Verifies that the given filename uses an allowed protocol.
+     *
+     * A scheme allow-list (instead of a `phar://` blacklist) closes the
+     * case-insensitive wrapper bypass that would otherwise reach file_exists()
+     * with e.g. `PHAR://`, enabling PHAR deserialization on PHP < 8.
+     *
+     * @throws \InvalidArgumentException if the filename is not valid
+     */
+    protected function isProtocolAllowed(string $filename): bool
+    {
+        if (false === $parsedFilename = \parse_url($filename)) {
+            throw new \InvalidArgumentException('The filename is not valid.');
+        }
+
+        $protocol = isset($parsedFilename['scheme']) ? \strtolower($parsedFilename['scheme']) : 'file';
+
+        if (
+            'Windows' === \PHP_OS_FAMILY
+            && 1 === \strlen($protocol)
+            && 1 === \preg_match(self::WINDOWS_LOCAL_FILENAME_REGEX, $filename)
+        ) {
+            $protocol = 'file';
+        }
+
+        return \in_array($protocol, self::ALLOWED_PROTOCOLS, true);
     }
 
     public function getDefaultExtension(): string
