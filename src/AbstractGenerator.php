@@ -64,7 +64,6 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         $this->setOptions($options);
         $this->env = empty($env) ? null : $env;
 
-        /** @phpstan-ignore-next-line */
         if (\is_callable([$this, 'removeTemporaryFiles'])) {
             \register_shutdown_function([$this, 'removeTemporaryFiles']);
         }
