@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog(https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Validate option values constrained by WeasyPrint to a fixed set (e.g. `format`, `pdf-variant`) against an allow-list (`WeasyPrintOptionValues`); invalid values are rejected by `setOption()` as defense-in-depth
+- New `buildCommandArray()` and `checkBinary()` protected methods on `AbstractGenerator`
+
+### Changed
+- **[BC break]** The WeasyPrint process is now executed from an argument array (`new Process([...])`) instead of a shell command string (`Process::fromShellCommandline()`). Execution no longer goes through a shell, removing shell-command injection as a class of vulnerability. The escaped string form (`getCommand()` / `buildCommand()`) is retained for logging and exception messages only.
+- **[BC break]** `executeCommand()` signature changed from `executeCommand(string $command)` to `executeCommand(array $command)`. Subclasses overriding it must be updated.
+- **[BC break]** The binary executability check moved out of `getEscapedBinary()` into the new `checkBinary()` method. Subclasses overriding `getEscapedBinary()` to bypass the check (e.g. test doubles) must override `checkBinary()` instead.
 
 ## 2.6.0 - 2026-05-25
 ### Security

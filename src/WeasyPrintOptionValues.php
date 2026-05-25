@@ -5,7 +5,7 @@ namespace Pontedilana\PhpWeasyPrint;
 /**
  * Single source of truth for WeasyPrint CLI options whose value is constrained
  * to a fixed set (argparse "choices"). Validating option values against this
- * allowlist prevents invalid values from reaching the command line and acts as
+ * allow-list prevents invalid values from reaching the command line and acts as
  * defense-in-depth against argument/command injection through those options.
  *
  * Only options that WeasyPrint itself restricts to a closed set are listed here;

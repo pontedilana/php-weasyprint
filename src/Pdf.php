@@ -123,7 +123,7 @@ class Pdf extends AbstractGenerator
     }
 
     /**
-     * Convert option content or url to file if it is needed.
+     * Convert option content or url to file if it is necessary.
      *
      * @param mixed $option
      */

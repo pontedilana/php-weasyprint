@@ -90,6 +90,15 @@ $pdf = new Pdf('/usr/local/bin/weasyprint', [], null, ['http', 'https', 'ftp']);
 $pdf = new Pdf('/usr/local/bin/weasyprint', allowedSchemes: ['http', 'https', 'ftp']);
 ```
 
+### Command execution
+
+The WeasyPrint process is executed from an argument array (`new Process([...])`), **never through a shell**. This makes command injection through option values, filenames or the binary path structurally impossible: there is no shell to interpret metacharacters, so no escaping is involved at execution time.
+
+`getCommand()` and `buildCommand()` still return the command as a human-readable, shell-escaped string, but that representation is used only for logging and exception messages — it is not what gets executed.
+
+> **Note for libraries extending `AbstractGenerator`/`Pdf`:**
+> if you override `executeCommand()`, its signature changed from `executeCommand(string $command)` to `executeCommand(array $command)`. The binary executability check also moved from `getEscapedBinary()` to the new `checkBinary()` method.
+
 ### Reset options
 Options can be reset to their initial values with `resetOptions()` method.
 

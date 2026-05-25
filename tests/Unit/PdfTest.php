@@ -12,7 +12,9 @@ use Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues;
  */
 class PdfTest extends TestCase
 {
-    public const SHELL_ARG_QUOTE_REGEX = '(?:"|\')'; // escapeshellarg produces double quotes on Windows, single quotes otherwise
+    // The executed command is now an argument array joined with spaces (no shell escaping),
+    // so quotes are optional: this keeps the regexes valid whether or not a value is quoted.
+    public const SHELL_ARG_QUOTE_REGEX = '(?:"|\')?';
 
     protected function tearDown(): void
     {
@@ -157,7 +159,7 @@ class PdfTest extends TestCase
 
             '8 - set integer, string, and boolean options' => [
                 ['pdf-variant' => 'pdf/ua-1', 'dpi' => 300, 'timeout' => 60, 'srgb' => true, 'resolution' => 100],
-                '/' . $q . 'emptyBinary' . $q . " --pdf-variant 'pdf\/ua-1' --dpi 300 --timeout 60 --srgb --resolution 100 " . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                '/' . $q . 'emptyBinary' . $q . ' --pdf-variant ' . $q . 'pdf\/ua-1' . $q . ' --dpi 300 --timeout 60 --srgb --resolution 100 ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
             '9 - new boolean options' => [
                 ['no-http-redirects' => true, 'fail-on-http-errors' => true, 'verbose' => true, 'debug' => true, 'info' => true, 'version' => true],

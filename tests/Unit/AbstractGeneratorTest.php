@@ -198,7 +198,9 @@ class AbstractGeneratorTest extends TestCase
             ->onlyMethods([
                 'configure',
                 'prepareOutput',
-                'getCommand',
+                'mergeOptions',
+                'buildCommand',
+                'buildCommandArray',
                 'executeCommand',
                 'checkOutput',
                 'checkProcessStatus',
@@ -234,8 +236,15 @@ class AbstractGeneratorTest extends TestCase
         ;
         $media
             ->expects($this->any())
-            ->method('getCommand')
+            ->method('mergeOptions')
+            ->with($this->equalTo(['foo' => 'bar']))
+            ->willReturn(['foo' => 'bar'])
+        ;
+        $media
+            ->expects($this->any())
+            ->method('buildCommand')
             ->with(
+                $this->equalTo('the_binary'),
                 $this->equalTo('the_input_file'),
                 $this->equalTo('the_output_file'),
                 $this->equalTo(['foo' => 'bar'])
@@ -243,9 +252,20 @@ class AbstractGeneratorTest extends TestCase
             ->willReturn('the command')
         ;
         $media
+            ->expects($this->any())
+            ->method('buildCommandArray')
+            ->with(
+                $this->equalTo('the_binary'),
+                $this->equalTo('the_input_file'),
+                $this->equalTo('the_output_file'),
+                $this->equalTo(['foo' => 'bar'])
+            )
+            ->willReturn(['the_binary', 'the_input_file', 'the_output_file'])
+        ;
+        $media
             ->expects($this->once())
             ->method('executeCommand')
-            ->with($this->equalTo('the command'))
+            ->with($this->equalTo(['the_binary', 'the_input_file', 'the_output_file']))
             ->willReturn([0, 'stdout', 'stderr'])
         ;
         $media
@@ -274,7 +294,9 @@ class AbstractGeneratorTest extends TestCase
             ->onlyMethods([
                 'configure',
                 'prepareOutput',
-                'getCommand',
+                'mergeOptions',
+                'buildCommand',
+                'buildCommandArray',
                 'executeCommand',
                 'checkOutput',
                 'checkProcessStatus',
@@ -312,17 +334,23 @@ class AbstractGeneratorTest extends TestCase
         ;
         $media
             ->expects($this->any())
-            ->method('getCommand')
-            ->with(
-                $this->equalTo('the_input_file'),
-                $this->equalTo('the_output_file')
-            )
+            ->method('mergeOptions')
+            ->willReturn(['foo' => 'bar'])
+        ;
+        $media
+            ->expects($this->any())
+            ->method('buildCommand')
             ->willReturn('the command')
+        ;
+        $media
+            ->expects($this->any())
+            ->method('buildCommandArray')
+            ->willReturn(['the_binary', 'the_input_file', 'the_output_file'])
         ;
         $media
             ->expects($this->once())
             ->method('executeCommand')
-            ->with($this->equalTo('the command'))
+            ->with($this->equalTo(['the_binary', 'the_input_file', 'the_output_file']))
             ->willReturn([1, 'stdout', 'stderr'])
         ;
         $media
@@ -1157,7 +1185,7 @@ class AbstractGeneratorTest extends TestCase
         (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         // Execute a simple command that should succeed
-        $result = $r->invokeArgs($media, ['echo "test"']);
+        $result = $r->invokeArgs($media, [[\PHP_BINARY, '-r', 'echo "test";']]);
 
         $this->assertIsArray($result, '->executeCommand() returns an array');
         $this->assertCount(3, $result, '->executeCommand() returns an array with 3 elements [status, stdout, stderr]');
@@ -1180,7 +1208,7 @@ class AbstractGeneratorTest extends TestCase
         (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         // Execute a command that should fail
-        $result = $r->invokeArgs($media, ['exit 1']);
+        $result = $r->invokeArgs($media, [[\PHP_BINARY, '-r', 'exit(1);']]);
 
         $this->assertIsArray($result, '->executeCommand() returns an array');
         $this->assertEquals(1, $result[0], '->executeCommand() returns non-zero exit code for failed command');

@@ -93,7 +93,15 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     {
         $this->prepareOutput($output, $overwrite);
 
-        $command = $this->getCommand($input, $output, $options);
+        if (null === $this->binary) {
+            throw new \LogicException('You must define a binary prior to conversion.');
+        }
+
+        $options = $this->mergeOptions($options);
+        $commandArray = $this->buildCommandArray($this->binary, $input, $output, $options);
+        // String form is kept for logging and exception messages only; the
+        // process is executed from the argument array, never through a shell.
+        $command = $this->buildCommand($this->binary, $input, $output, $options);
 
         $this->logger->info(\sprintf('Generate from file(s) "%s" to file "%s".', $input, $output), [
             'command' => $command,
@@ -104,7 +112,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         $status = null;
         $stdout = $stderr = '';
         try {
-            [$status, $stdout, $stderr] = $this->executeCommand($command);
+            [$status, $stdout, $stderr] = $this->executeCommand($commandArray);
             $this->checkProcessStatus($status, $stdout, $stderr, $command);
             $this->checkOutput($output, $command);
         } catch (\Exception $e) {
@@ -197,6 +205,52 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     }
 
     /**
+     * Builds the command as a list of arguments, ready to be passed to
+     * Symfony Process without going through a shell. This is the form used for
+     * actual execution: arguments reach the binary verbatim, so no shell
+     * metacharacter can be interpreted and no escaping is required.
+     *
+     * @param string                                    $binary  The binary path/name
+     * @param string                                    $input   Url or file location of the page to process
+     * @param string                                    $output  File location to the pdf-or-image-to-be
+     * @param array<string, bool|int|string|array|null> $options An array of options
+     *
+     * @return list<string>
+     */
+    protected function buildCommandArray(string $binary, string $input, string $output, array $options = []): array
+    {
+        $this->checkBinary($binary);
+
+        $command = [$binary];
+
+        foreach ($options as $key => $option) {
+            if (null === $option || false === $option) {
+                continue;
+            }
+
+            if (true === $option) {
+                $command[] = '--' . $key;
+                continue;
+            }
+
+            if (\is_array($option)) {
+                foreach ($option as $v) {
+                    $command[] = '--' . $key;
+                    $command[] = (string)$v;
+                }
+            } else {
+                $command[] = '--' . $key;
+                $command[] = (string)$option;
+            }
+        }
+
+        $command[] = $input;
+        $command[] = $output;
+
+        return $command;
+    }
+
+    /**
      * Verifies the binary points to a real executable file, then returns it shell-escaped.
      * Validating before escaping prevents shell-command injection through an
      * attacker-controlled binary string.
@@ -205,22 +259,32 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     protected function getEscapedBinary(string $binary): string
     {
-        if (!\is_executable($binary)) {
-            throw new \RuntimeException(\sprintf("The binary '%s' is not executable.", $binary));
-        }
+        $this->checkBinary($binary);
 
         return \escapeshellarg($binary);
     }
 
     /**
-     * Executes the given command via shell and returns the complete output as
-     * a string.
+     * @throws \RuntimeException if the binary is not an executable file
+     */
+    protected function checkBinary(string $binary): void
+    {
+        if (!\is_executable($binary)) {
+            throw new \RuntimeException(\sprintf("The binary '%s' is not executable.", $binary));
+        }
+    }
+
+    /**
+     * Executes the given command (as an argument list) without a shell and
+     * returns the complete output as a string.
+     *
+     * @param list<string> $command
      *
      * @return array{int|null, string, string} [status, stdout, stderr]
      */
-    protected function executeCommand(string $command): array
+    protected function executeCommand(array $command): array
     {
-        $process = Process::fromShellCommandline($command, null, $this->env, null, $this->timeout);
+        $process = new Process($command, null, $this->env, null, $this->timeout);
         $process->run();
 
         return [
