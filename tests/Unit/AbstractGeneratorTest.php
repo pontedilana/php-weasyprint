@@ -803,8 +803,10 @@ class AbstractGeneratorTest extends TestCase
             ->getMock()
         ;
 
+        // A null-content temporary file is never written to disk, so there is nothing
+        // to unlink at cleanup time (realpath() cannot confirm it lives in the folder).
         $generator
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('unlink')
         ;
 
@@ -815,6 +817,36 @@ class AbstractGeneratorTest extends TestCase
         $files = new \ReflectionProperty($generator, 'temporaryFiles');
         (\PHP_VERSION_ID < 80100) && $files->setAccessible(true);
         $this->assertCount(1, $files->getValue($generator));
+
+        $remove = new \ReflectionMethod($generator, 'removeTemporaryFiles');
+        (\PHP_VERSION_ID < 80100) && $remove->setAccessible(true);
+        $remove->invoke($generator);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::removeTemporaryFiles
+     */
+    public function testRemoveTemporaryFilesSkipsFilesOutsideTemporaryFolder(): void
+    {
+        $generator = $this->getMockBuilder(AbstractGenerator::class)
+            ->onlyMethods([
+                'configure',
+                'unlink',
+            ])
+            ->setConstructorArgs(['the_binary'])
+            ->getMock()
+        ;
+
+        // A path injected into the public $temporaryFiles that lives outside the
+        // temporary folder must never be unlinked.
+        $generator
+            ->expects($this->never())
+            ->method('unlink')
+        ;
+
+        $files = new \ReflectionProperty($generator, 'temporaryFiles');
+        (\PHP_VERSION_ID < 80100) && $files->setAccessible(true);
+        $files->setValue($generator, [__FILE__]);
 
         $remove = new \ReflectionMethod($generator, 'removeTemporaryFiles');
         (\PHP_VERSION_ID < 80100) && $remove->setAccessible(true);
@@ -919,31 +951,68 @@ class AbstractGeneratorTest extends TestCase
     }
 
     /**
-     * test against CVE-2023-28115
-     * fix and test by @AntoineLelaisant.
+     * Regression against CVE-2023-28115 and its case-insensitive wrapper bypass.
+     *
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::isProtocolAllowed
+     *
+     * @dataProvider dataForProtocolCheck
      */
-    public function testFailingGenerateWithOutputContainingPharPrefix(): void
+    public function testIsProtocolAllowed(string $filename, bool $expected): void
     {
-        $media = $this->getMockBuilder(AbstractGenerator::class)
-            ->onlyMethods([
-                'configure',
-                'prepareOutput',
-            ])
-            ->setConstructorArgs(['the_binary', [], ['PATH' => '/usr/bin']])
-            ->getMock()
-        ;
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+        $r = new \ReflectionMethod($media, 'isProtocolAllowed');
+        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
-        $media->setTimeout(2000);
+        $this->assertSame($expected, $r->invokeArgs($media, [$filename]));
+    }
 
-        $media
-            ->expects($this->once())
-            ->method('prepareOutput')
-            ->with($this->equalTo('phar://the_output_file'))
-        ;
+    /**
+     * @return array<string, array{string, bool}>
+     */
+    public function dataForProtocolCheck(): array
+    {
+        return [
+            'relative local path' => ['out.pdf', true],
+            'absolute local path' => ['/tmp/out.pdf', true],
+            'file scheme' => ['file:///tmp/out.pdf', true],
+            'lowercase phar' => ['phar://exploit.phar', false],
+            'uppercase phar (bypass)' => ['PHAR://exploit.phar', false],
+            'mixed-case phar (bypass)' => ['PhAr://exploit.phar', false],
+            'php filter wrapper' => ['php://filter/convert.base64-encode/resource=/etc/passwd', false],
+            'remote http' => ['http://example.com/x.pdf', false],
+            'remote https' => ['https://example.com/x.pdf', false],
+            'ftp' => ['ftp://example.com/x', false],
+        ];
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::prepareOutput
+     *
+     * @dataProvider dataForDisallowedOutputProtocol
+     */
+    public function testPrepareOutputRejectsDisallowedProtocols(string $filename): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+        $r = new \ReflectionMethod($media, 'prepareOutput');
+        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The output file scheme is not supported.');
 
-        $media->generate('the_input_file', 'phar://the_output_file', ['foo' => 'bar']);
+        $r->invokeArgs($media, [$filename, false]);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public function dataForDisallowedOutputProtocol(): array
+    {
+        return [
+            'lowercase phar' => ['phar://the_output_file'],
+            'uppercase phar (bypass)' => ['PHAR://the_output_file'],
+            'php filter wrapper' => ['php://filter/resource=/tmp/x'],
+            'remote http' => ['http://example.com/x.pdf'],
+        ];
     }
 
     /**

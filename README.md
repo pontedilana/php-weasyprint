@@ -5,7 +5,7 @@ It's a wrapper for [WeasyPrint](https://weasyprint.org/), a smart solution helpi
 
 You will have to download and install WeasyPrint to use PhpWeasyPrint (version 60 or greater is required).
 
-This library is massively inspired by [KnpLabs/snappy](https://github.com/KnpLabs/snappy), of which it aims to be a one-to-one substitute (`GeneratorInterface` is the same).
+This library is massively inspired by [KnpLabs/snappy](https://github.com/KnpLabs/snappy) and aims to be a drop-in replacement: its `GeneratorInterface` mirrors Snappy's method contract (same method names and behaviour), though it lives in its own namespace and is strictly typed (`string`-only input, declared return types).
 See "[Differences with Snappy](#differences-with-snappy)" section to see how the two differs
 
 ## Installation using [Composer](https://getcomposer.org/)
@@ -67,6 +67,27 @@ $pdf->setOption('presentational-hints', true);
 $pdf->setOption('optimize-images', true);
 $pdf->setOption('stylesheet', ['/path/to/first-style.css', '/path/to/second-style.css']);
 $pdf->setOption('attachment', ['/path/to/image.png', '/path/to/logo.jpg']);
+```
+
+### Allowed URL schemes
+
+Options that accept URLs (e.g. `attachment`) may be fetched server-side by the library.
+To prevent SSRF and local file disclosure, only `http` and `https` URLs are fetched by
+default; a value with any other scheme is treated as inline content instead of being
+fetched. Local files keep working through their plain filesystem path.
+
+If you need to fetch other schemes, pass an allow-list as the fourth constructor argument:
+
+```php
+// Default: only http(s) URLs are fetched
+$pdf = new Pdf('/usr/local/bin/weasyprint');
+$pdf->setOption('attachment', ['https://example.com/logo.png', '/path/to/local.png']);
+
+// Opt in to additional schemes (e.g. ftp)
+$pdf = new Pdf('/usr/local/bin/weasyprint', [], null, ['http', 'https', 'ftp']);
+
+// Or, with named arguments (PHP 8.0+)
+$pdf = new Pdf('/usr/local/bin/weasyprint', allowedSchemes: ['http', 'https', 'ftp']);
 ```
 
 ### Reset options

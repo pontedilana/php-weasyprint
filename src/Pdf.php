@@ -15,12 +15,30 @@ class Pdf extends AbstractGenerator
     protected array $optionsWithContentCheck = [];
 
     /**
-     * {@inheritdoc}
+     * URL schemes the library is allowed to fetch server-side for options that
+     * accept URLs (e.g. `attachment`). Restricting these prevents SSRF and local
+     * file disclosure (file://, php://, ftp://, ...) through an attacker-controlled
+     * option value: a URL with a non-allowed scheme is treated as inline content
+     * instead of being fetched.
+     *
+     * @var list<string>
      */
-    public function __construct(?string $binary = null, array $options = [], ?array $env = null)
+    private array $allowedSchemes = ['http', 'https'];
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param list<string>|null $allowedSchemes URL schemes allowed for options that accept URLs (e.g. 'http', 'https', 'ftp', 'file'). If null, defaults to ['http', 'https'].
+     */
+    public function __construct(?string $binary = null, array $options = [], ?array $env = null, ?array $allowedSchemes = null)
     {
         $this->setDefaultExtension('pdf');
         $this->setOptionsWithContentCheck();
+
+        if (null !== $allowedSchemes) {
+            $this->allowedSchemes = $allowedSchemes;
+        }
+
         parent::__construct($binary, $options, $env);
     }
 
@@ -111,7 +129,11 @@ class Pdf extends AbstractGenerator
      */
     protected function isOptionUrl($option): bool
     {
-        return false !== \filter_var($option, \FILTER_VALIDATE_URL);
+        $url = \parse_url((string)$option);
+
+        return false !== $url
+            && isset($url['scheme'])
+            && \in_array(\strtolower($url['scheme']), $this->allowedSchemes, true);
     }
 
     protected function configure(): void
