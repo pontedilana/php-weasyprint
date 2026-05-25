@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog(https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Security
+- Fix potential SSRF and local file disclosure: option URLs are fetched server-side only when their scheme is allowed (`http`, `https` by default, configurable via the new `$allowedSchemes` constructor argument)
 
 ## 2.5.1 - 2026-05-25
 ### Security

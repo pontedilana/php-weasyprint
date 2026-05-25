@@ -265,4 +265,55 @@ class PdfTest extends TestCase
 
         $method->invoke($pdf, $maliciousBinary, 'input.html', 'output.pdf', []);
     }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::isOptionUrl
+     */
+    public function testIsOptionUrlOnlyAllowsConfiguredSchemes(): void
+    {
+        $pdf = new PdfSpy();
+        $method = new \ReflectionMethod($pdf, 'isOptionUrl');
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
+
+        $this->assertTrue($method->invoke($pdf, 'https://example.com/style.css'));
+        $this->assertTrue($method->invoke($pdf, 'http://example.com/style.css'));
+        $this->assertFalse($method->invoke($pdf, 'file:///etc/passwd'));
+        $this->assertFalse($method->invoke($pdf, 'php://filter/convert.base64-encode/resource=/etc/passwd'));
+        $this->assertFalse($method->invoke($pdf, 'ftp://example.com/secret'));
+        $this->assertFalse($method->invoke($pdf, '/plain/local/path'));
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::__construct
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::isOptionUrl
+     */
+    public function testAllowedSchemesCanBeConfiguredViaConstructor(): void
+    {
+        $pdf = new Pdf('weasyprint', [], null, ['http', 'https', 'file']);
+        $method = new \ReflectionMethod($pdf, 'isOptionUrl');
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
+
+        $this->assertTrue($method->invoke($pdf, 'file:///etc/passwd'));
+        $this->assertFalse($method->invoke($pdf, 'php://filter/resource=/etc/passwd'));
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::handleArrayOptions
+     */
+    public function testAttachmentWithDisallowedSchemeIsTreatedAsContentNotFetched(): void
+    {
+        $pdf = new PdfSpy();
+        $method = new \ReflectionMethod($pdf, 'handleArrayOptions');
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
+
+        $payload = 'php://filter/convert.base64-encode/resource=/etc/passwd';
+
+        /** @var list<string> $result */
+        $result = $method->invoke($pdf, 'attachment', $payload);
+
+        // The php:// wrapper is never fetched: the value is written verbatim to a temp
+        // file. If file_get_contents() had run, the file would hold base64 of /etc/passwd.
+        $this->assertCount(1, $result);
+        $this->assertStringEqualsFile($result[0], $payload);
+    }
 }

@@ -69,6 +69,27 @@ $pdf->setOption('stylesheet', ['/path/to/first-style.css', '/path/to/second-styl
 $pdf->setOption('attachment', ['/path/to/image.png', '/path/to/logo.jpg']);
 ```
 
+### Allowed URL schemes
+
+Options that accept URLs (e.g. `attachment`) may be fetched server-side by the library.
+To prevent SSRF and local file disclosure, only `http` and `https` URLs are fetched by
+default; a value with any other scheme is treated as inline content instead of being
+fetched. Local files keep working through their plain filesystem path.
+
+If you need to fetch other schemes, pass an allow-list as the fourth constructor argument:
+
+```php
+// Default: only http(s) URLs are fetched
+$pdf = new Pdf('/usr/local/bin/weasyprint');
+$pdf->setOption('attachment', ['https://example.com/logo.png', '/path/to/local.png']);
+
+// Opt in to additional schemes (e.g. ftp)
+$pdf = new Pdf('/usr/local/bin/weasyprint', [], null, ['http', 'https', 'ftp']);
+
+// Or, with named arguments (PHP 8.0+)
+$pdf = new Pdf('/usr/local/bin/weasyprint', allowedSchemes: ['http', 'https', 'ftp']);
+```
+
 ### Reset options
 Options can be reset to their initial values with `resetOptions()` method.
 
