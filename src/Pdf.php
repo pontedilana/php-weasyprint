@@ -166,8 +166,7 @@ class Pdf extends AbstractGenerator
      */
     protected function buildCommand(string $binary, string $input, string $output, array $options = []): string
     {
-        $escapedBinary = \escapeshellarg($binary);
-        $command = \is_executable($escapedBinary) ? $escapedBinary : $binary;
+        $command = $this->getEscapedBinary($binary);
 
         foreach ($options as $key => $option) {
             if (null === $option || false === $option) {

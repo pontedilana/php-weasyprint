@@ -546,7 +546,8 @@ class AbstractGeneratorTest extends TestCase
 
     public function dataForBuildCommand(): array
     {
-        $theBinary = $this->getPHPExecutableFromPath() . ' -v'; // i.e.: '/usr/bin/php -v'
+        $theBinary = (string)$this->getPHPExecutableFromPath(); // i.e.: '/usr/bin/php'
+        $escapedBinary = \escapeshellarg($theBinary);
 
         return [
             [
@@ -554,7 +555,7 @@ class AbstractGeneratorTest extends TestCase
                 'https://the.url/',
                 '/the/path',
                 [],
-                $theBinary . ' ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
+                $escapedBinary . ' ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
             ],
             [
                 $theBinary,
@@ -565,7 +566,7 @@ class AbstractGeneratorTest extends TestCase
                     'bar' => false,
                     'baz' => [],
                 ],
-                $theBinary . ' ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
+                $escapedBinary . ' ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
             ],
             [
                 $theBinary,
@@ -576,7 +577,7 @@ class AbstractGeneratorTest extends TestCase
                     'bar' => ['barvalue1', 'barvalue2'],
                     'baz' => true,
                 ],
-                $theBinary . ' --foo ' . \escapeshellarg('foovalue') . ' --bar ' . \escapeshellarg('barvalue1') . ' --bar ' . \escapeshellarg('barvalue2') . ' --baz ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
+                $escapedBinary . ' --foo ' . \escapeshellarg('foovalue') . ' --bar ' . \escapeshellarg('barvalue1') . ' --bar ' . \escapeshellarg('barvalue2') . ' --baz ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
             ],
             [
                 $theBinary,
@@ -585,9 +586,27 @@ class AbstractGeneratorTest extends TestCase
                 [
                     'attachment' => ['/path1', '/path2'],
                 ],
-                $theBinary . ' --attachment ' . \escapeshellarg('/path1') . ' --attachment ' . \escapeshellarg('/path2') . ' ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
+                $escapedBinary . ' --attachment ' . \escapeshellarg('/path1') . ' --attachment ' . \escapeshellarg('/path2') . ' ' . \escapeshellarg('https://the.url/') . ' ' . \escapeshellarg('/the/path'),
             ],
         ];
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::buildCommand
+     */
+    public function testBuildCommandThrowsOnNonExecutableBinary(): void
+    {
+        $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
+
+        $r = new \ReflectionMethod($media, 'buildCommand');
+        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
+
+        $maliciousBinary = 'weasyprint; touch /tmp/pwn; #';
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf("The binary '%s' is not executable.", $maliciousBinary));
+
+        $r->invokeArgs($media, [$maliciousBinary, 'https://the.url/', '/the/path', []]);
     }
 
     /**

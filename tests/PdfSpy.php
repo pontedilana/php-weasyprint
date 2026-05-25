@@ -26,6 +26,12 @@ class PdfSpy extends Pdf
         return 'output';
     }
 
+    protected function getEscapedBinary(string $binary): string
+    {
+        // 'emptyBinary' is a stub, not a real file: skip the executable check in the spy.
+        return \escapeshellarg($binary);
+    }
+
     protected function executeCommand(string $command): array
     {
         $this->lastCommand = $command;
