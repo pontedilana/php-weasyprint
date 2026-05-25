@@ -168,8 +168,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     protected function buildCommand(string $binary, string $input, string $output, array $options = []): string
     {
-        $escapedBinary = \escapeshellarg($binary);
-        $command = \is_executable($escapedBinary) ? $escapedBinary : $binary;
+        $command = $this->getEscapedBinary($binary);
 
         foreach ($options as $key => $option) {
             if (null === $option || false === $option) {
@@ -191,6 +190,22 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         }
 
         return $command . (' ' . \escapeshellarg($input) . ' ' . \escapeshellarg($output));
+    }
+
+    /**
+     * Verifies the binary points to a real executable file, then returns it shell-escaped.
+     * Validating before escaping prevents shell-command injection through an
+     * attacker-controlled binary string.
+     *
+     * @throws \RuntimeException if the binary is not an executable file
+     */
+    protected function getEscapedBinary(string $binary): string
+    {
+        if (!\is_executable($binary)) {
+            throw new \RuntimeException(\sprintf("The binary '%s' is not executable.", $binary));
+        }
+
+        return \escapeshellarg($binary);
     }
 
     /**

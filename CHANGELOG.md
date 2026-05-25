@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog(https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Security
+- Fix potential shell-command injection through the WeasyPrint binary path: `buildCommand()` now verifies the binary is executable on the unescaped path and shell-escapes it before use
 
 ## 2.5.0 - 2026-04-03
 ### Added
