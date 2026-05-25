@@ -445,6 +445,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
             throw new \InvalidArgumentException(\sprintf('The option \'%s\' does not exist.', $name));
         }
 
+        $this->validateOptionValue($name, $value);
+
         $this->options[$name] = $value;
 
         $this->logger->debug(\sprintf('Set option "%s".', $name), ['value' => $value]);
@@ -528,10 +530,24 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
                 throw new \InvalidArgumentException(\sprintf('The option \'%s\' does not exist.', $name));
             }
 
+            $this->validateOptionValue($name, $value);
+
             $mergedOptions[$name] = $value;
         }
 
         return $mergedOptions;
+    }
+
+    /**
+     * Hook for concrete generators to validate an option value before it is
+     * stored or merged. No-op by default; override to constrain values.
+     *
+     * @param bool|int|string|array|null $value
+     *
+     * @throws \InvalidArgumentException if the value is not allowed for the option
+     */
+    protected function validateOptionValue(string $name, $value): void
+    {
     }
 
     /**

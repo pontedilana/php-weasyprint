@@ -136,6 +136,31 @@ class Pdf extends AbstractGenerator
             && \in_array(\strtolower($url['scheme']), $this->allowedSchemes, true);
     }
 
+    /**
+     * Validates an option value against the WeasyPrint allow-list of constrained
+     * values. Null and booleans are passed through (unset / flags). Arrays are
+     * validated element by element, so a repeatable constrained option cannot
+     * smuggle a disallowed value.
+     *
+     * @param bool|int|string|array|null $value
+     *
+     * @throws \InvalidArgumentException if the value is not allowed for the option
+     */
+    protected function validateOptionValue(string $name, $value): void
+    {
+        if (null === $value || \is_bool($value)) {
+            return;
+        }
+
+        $values = \is_array($value) ? $value : [$value];
+
+        foreach ($values as $item) {
+            if (!WeasyPrintOptionValues::isAllowed($name, $item)) {
+                throw new \InvalidArgumentException(\sprintf("The value '%s' is not allowed for option '%s'. Allowed values: '%s'.", (string)$item, $name, \implode("', '", WeasyPrintOptionValues::getAllowedValues($name))));
+            }
+        }
+    }
+
     protected function configure(): void
     {
         $this->addOptions([
@@ -206,9 +231,6 @@ class Pdf extends AbstractGenerator
                 }
             } else {
                 switch ($key) {
-                    case 'format':
-                        $command .= ' --' . $key . ' ' . $option;
-                        break;
                     case 'dpi':
                     case 'jpeg-quality':
                     case 'resolution':

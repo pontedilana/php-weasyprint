@@ -5,6 +5,7 @@ namespace Pontedilana\PhpWeasyPrint\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\Pdf;
 use Pontedilana\PhpWeasyPrint\Tests\PdfSpy;
+use Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues;
 
 /**
  * @covers \Pontedilana\PhpWeasyPrint\Pdf
@@ -32,7 +33,7 @@ class PdfTest extends TestCase
 
         $htmlFiles = new \CallbackFilterIterator(
             new \DirectoryIterator(__DIR__),
-            function($filename) {
+            static function($filename) {
                 return 1 === \preg_match('/\.html$/', $filename);
             }
         );
@@ -246,8 +247,79 @@ class PdfTest extends TestCase
             'format' => 'pdf',
         ]);
 
-        // The format option should be passed without escaping (deprecated option)
-        $this->assertStringContainsString('--format pdf', $command);
+        // The format value must be shell-escaped like any other scalar option.
+        $q = self::SHELL_ARG_QUOTE_REGEX;
+        $this->assertMatchesRegularExpression('/--format ' . $q . 'pdf' . $q . '/', $command);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setOption
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::validateOptionValue
+     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
+     */
+    public function testSetOptionRejectsValueOutsideWhitelist(): void
+    {
+        $pdf = new PdfSpy();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("The value 'pdf; touch /tmp/pwn' is not allowed for option 'format'.");
+
+        $pdf->setOption('format', 'pdf; touch /tmp/pwn');
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::mergeOptions
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::validateOptionValue
+     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
+     */
+    public function testPerCallOptionRejectsValueOutsideWhitelist(): void
+    {
+        $pdf = new PdfSpy();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("The value 'pdf/foo' is not allowed for option 'pdf-variant'.");
+
+        $pdf->getOutputFromHtml('<html></html>', ['pdf-variant' => 'pdf/foo']);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::validateOptionValue
+     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
+     */
+    public function testWhitelistedValuesAreAccepted(): void
+    {
+        $pdf = new PdfSpy();
+        $pdf->setOption('format', 'png');
+        $pdf->setOption('pdf-variant', 'pdf/a-3b');
+        $pdf->getOutputFromHtml('<html></html>');
+
+        $q = self::SHELL_ARG_QUOTE_REGEX;
+        $this->assertMatchesRegularExpression('/--format ' . $q . 'png' . $q . '/', $pdf->getLastCommand());
+        $this->assertMatchesRegularExpression('/--pdf-variant ' . $q . 'pdf\/a-3b' . $q . '/', $pdf->getLastCommand());
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::validateOptionValue
+     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
+     */
+    public function testConstrainedOptionValidatesEachArrayElement(): void
+    {
+        $pdf = new PdfSpy();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("The value 'pdf/bogus' is not allowed for option 'pdf-variant'.");
+
+        $pdf->setOption('pdf-variant', ['pdf/a-3b', 'pdf/bogus']);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
+     */
+    public function testUnconstrainedOptionsAcceptAnyValue(): void
+    {
+        $this->assertTrue(WeasyPrintOptionValues::isAllowed('encoding', 'anything-goes'));
+        $this->assertFalse(WeasyPrintOptionValues::isConstrained('encoding'));
+        $this->assertTrue(WeasyPrintOptionValues::isConstrained('format'));
     }
 
     /**
