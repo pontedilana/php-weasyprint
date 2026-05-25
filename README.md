@@ -5,7 +5,7 @@ It's a wrapper for [WeasyPrint](https://weasyprint.org/), a smart solution helpi
 
 You will have to download and install WeasyPrint to use PhpWeasyPrint (version 60 or greater is required).
 
-This library is massively inspired by [KnpLabs/snappy](https://github.com/KnpLabs/snappy), of which it aims to be a one-to-one substitute (`GeneratorInterface` is the same).
+This library is massively inspired by [KnpLabs/snappy](https://github.com/KnpLabs/snappy) and aims to be a drop-in replacement: its `GeneratorInterface` mirrors Snappy's method contract (same method names and behaviour), though it lives in its own namespace and is strictly typed (`string`-only input, declared return types).
 See "[Differences with Snappy](#differences-with-snappy)" section to see how the two differs
 
 ## Installation using [Composer](https://getcomposer.org/)
