@@ -325,7 +325,20 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     public function removeTemporaryFiles(): void
     {
+        $temporaryFolderPath = \realpath($this->getTemporaryFolder());
+        if (false === $temporaryFolderPath) {
+            return;
+        }
+        $temporaryFolderPath = \rtrim($temporaryFolderPath, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR;
+
         foreach ($this->temporaryFiles as $file) {
+            // Only delete files actually located inside the temporary folder, so a path
+            // injected into the public $temporaryFiles cannot turn cleanup into an
+            // arbitrary file deletion at shutdown.
+            $filePath = \realpath($file);
+            if (false === $filePath || 0 !== \strncmp($filePath, $temporaryFolderPath, \strlen($temporaryFolderPath))) {
+                continue;
+            }
             $this->unlink($file);
         }
     }

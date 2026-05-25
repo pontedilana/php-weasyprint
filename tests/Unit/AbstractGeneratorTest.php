@@ -803,8 +803,10 @@ class AbstractGeneratorTest extends TestCase
             ->getMock()
         ;
 
+        // A null-content temporary file is never written to disk, so there is nothing
+        // to unlink at cleanup time (realpath() cannot confirm it lives in the folder).
         $generator
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('unlink')
         ;
 
@@ -815,6 +817,36 @@ class AbstractGeneratorTest extends TestCase
         $files = new \ReflectionProperty($generator, 'temporaryFiles');
         (\PHP_VERSION_ID < 80100) && $files->setAccessible(true);
         $this->assertCount(1, $files->getValue($generator));
+
+        $remove = new \ReflectionMethod($generator, 'removeTemporaryFiles');
+        (\PHP_VERSION_ID < 80100) && $remove->setAccessible(true);
+        $remove->invoke($generator);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::removeTemporaryFiles
+     */
+    public function testRemoveTemporaryFilesSkipsFilesOutsideTemporaryFolder(): void
+    {
+        $generator = $this->getMockBuilder(AbstractGenerator::class)
+            ->onlyMethods([
+                'configure',
+                'unlink',
+            ])
+            ->setConstructorArgs(['the_binary'])
+            ->getMock()
+        ;
+
+        // A path injected into the public $temporaryFiles that lives outside the
+        // temporary folder must never be unlinked.
+        $generator
+            ->expects($this->never())
+            ->method('unlink')
+        ;
+
+        $files = new \ReflectionProperty($generator, 'temporaryFiles');
+        (\PHP_VERSION_ID < 80100) && $files->setAccessible(true);
+        $files->setValue($generator, [__FILE__]);
 
         $remove = new \ReflectionMethod($generator, 'removeTemporaryFiles');
         (\PHP_VERSION_ID < 80100) && $remove->setAccessible(true);

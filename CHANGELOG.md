@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 ## Unreleased
 ### Security
 - Fix potential SSRF and local file disclosure: option URLs are fetched server-side only when their scheme is allowed (`http`, `https` by default, configurable via the new `$allowedSchemes` constructor argument)
+- Fix potential arbitrary file deletion at shutdown: `removeTemporaryFiles()` now only deletes files located inside the temporary folder
 
 ## 2.5.1 - 2026-05-25
 ### Security
