@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 - Validate option values constrained by WeasyPrint to a fixed set (e.g. `format`, `pdf-variant`) against an allow-list (`WeasyPrintOptionValues`); invalid values are rejected by `setOption()` as defense-in-depth
 - New `buildCommandArray()` and `checkBinary()` protected methods on `AbstractGenerator`
 
+### Removed
+- **[BC break]** Drop support for PHP 7.4, 8.0, 8.1 and 8.2; the minimum required version is now PHP 8.3
+- **[BC break]** Drop support for Symfony 5.4 (end of life); supported `symfony/process` versions are now 6.4, 7.4 and 8.0
 ### Changed
 - **[BC break]** The WeasyPrint process is now executed from an argument array (`new Process([...])`) instead of a shell command string (`Process::fromShellCommandline()`). Execution no longer goes through a shell, removing shell-command injection as a class of vulnerability. The escaped string form (`getCommand()` / `buildCommand()`) is retained for logging and exception messages only.
 - **[BC break]** `executeCommand()` signature changed from `executeCommand(string $command)` to `executeCommand(array $command)`. Subclasses overriding it must be updated.

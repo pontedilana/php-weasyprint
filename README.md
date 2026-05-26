@@ -8,6 +8,9 @@ You will have to download and install WeasyPrint to use PhpWeasyPrint (version 6
 This library is massively inspired by [KnpLabs/snappy](https://github.com/KnpLabs/snappy) and aims to be a drop-in replacement: its `GeneratorInterface` mirrors Snappy's method contract (same method names and behaviour), though it lives in its own namespace and is strictly typed (`string`-only input, declared return types).
 See "[Differences with Snappy](#differences-with-snappy)" section to see how the two differs
 
+## Requirements
+
+* PHP 8.3, 8.4 or 8.5
 ## Installation using [Composer](https://getcomposer.org/)
 
 ```bash

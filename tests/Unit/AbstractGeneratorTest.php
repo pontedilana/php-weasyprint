@@ -21,7 +21,6 @@ class AbstractGeneratorTest extends TestCase
         $this->assertEquals([], $media->getOptions());
 
         $r = new \ReflectionMethod($media, 'addOption');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
         $r->invokeArgs($media, ['foo', 'bar']);
 
         $this->assertEquals(['foo' => 'bar'], $media->getOptions(), '->addOption() adds an option');
@@ -46,7 +45,6 @@ class AbstractGeneratorTest extends TestCase
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
         $r = new \ReflectionMethod($media, 'addOption');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
         $r->invokeArgs($media, ['foo', 'bar']);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -63,7 +61,6 @@ class AbstractGeneratorTest extends TestCase
         $this->assertEquals([], $media->getOptions());
 
         $r = new \ReflectionMethod($media, 'addOptions');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
         $r->invokeArgs($media, [['foo' => 'bar', 'baz' => 'bat']]);
 
         $this->assertEquals(
@@ -97,7 +94,6 @@ class AbstractGeneratorTest extends TestCase
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
         $r = new \ReflectionMethod($media, 'addOptions');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
         $r->invokeArgs($media, [['foo' => 'bar', 'baz' => 'bat']]);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -123,7 +119,6 @@ class AbstractGeneratorTest extends TestCase
         $logger->expects($this->once())->method('debug');
 
         $r = new \ReflectionMethod($media, 'addOption');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
         $r->invokeArgs($media, ['foo', 'bar']);
 
         $media->setOption('foo', 'abc');
@@ -165,7 +160,6 @@ class AbstractGeneratorTest extends TestCase
         $logger->expects($this->exactly(4))->method('debug');
 
         $r = new \ReflectionMethod($media, 'addOptions');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
         $r->invokeArgs($media, [['foo' => 'bar', 'baz' => 'bat']]);
 
         $media->setOptions(['foo' => 'abc', 'baz' => 'def']);
@@ -505,11 +499,9 @@ class AbstractGeneratorTest extends TestCase
         $originalOptions = ['foo' => 'bar', 'baz' => 'bat'];
 
         $addOptions = new \ReflectionMethod($media, 'addOptions');
-        (\PHP_VERSION_ID < 80100) && $addOptions->setAccessible(true);
         $addOptions->invokeArgs($media, [$originalOptions]);
 
         $r = new \ReflectionMethod($media, 'mergeOptions');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $mergedOptions = $r->invokeArgs($media, [['foo' => 'ban']]);
 
@@ -549,11 +541,9 @@ class AbstractGeneratorTest extends TestCase
         $originalOptions = ['foo' => 'bar', 'baz' => 'bat'];
 
         $addOptions = new \ReflectionMethod($media, 'addOptions');
-        (\PHP_VERSION_ID < 80100) && $addOptions->setAccessible(true);
         $addOptions->invokeArgs($media, [$originalOptions]);
 
         $r = new \ReflectionMethod($media, 'mergeOptions');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $this->expectException(\InvalidArgumentException::class);
         $mergedOptions = $r->invokeArgs($media, [['bad' => 'ban']]);
@@ -567,7 +557,6 @@ class AbstractGeneratorTest extends TestCase
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
         $r = new \ReflectionMethod($media, 'buildCommand');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $this->assertEquals($expected, $r->invokeArgs($media, [$binary, $url, $path, $options]));
     }
@@ -627,7 +616,6 @@ class AbstractGeneratorTest extends TestCase
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
         $r = new \ReflectionMethod($media, 'buildCommand');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $maliciousBinary = 'weasyprint; touch /tmp/pwn; #';
 
@@ -665,7 +653,6 @@ class AbstractGeneratorTest extends TestCase
         ;
 
         $r = new \ReflectionMethod($media, 'checkOutput');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $message = '->checkOutput() checks both file existence and size';
 
@@ -699,7 +686,6 @@ class AbstractGeneratorTest extends TestCase
         ;
 
         $r = new \ReflectionMethod($media, 'checkOutput');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $message = '->checkOutput() throws an InvalidArgumentException when the file does not exist';
 
@@ -740,7 +726,6 @@ class AbstractGeneratorTest extends TestCase
         ;
 
         $r = new \ReflectionMethod($media, 'checkOutput');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $message = '->checkOutput() throws an InvalidArgumentException when the file is empty';
 
@@ -764,7 +749,6 @@ class AbstractGeneratorTest extends TestCase
         ;
 
         $r = new \ReflectionMethod($media, 'checkProcessStatus');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         try {
             $r->invokeArgs($media, [0, '', '', 'the command']);
@@ -812,7 +796,6 @@ class AbstractGeneratorTest extends TestCase
             ->willReturn(true)
         ;
         $r = new \ReflectionMethod($media, 'prepareOutput');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $r->invokeArgs($media, ['', false]);
     }
@@ -839,15 +822,12 @@ class AbstractGeneratorTest extends TestCase
         ;
 
         $create = new \ReflectionMethod($generator, 'createTemporaryFile');
-        (\PHP_VERSION_ID < 80100) && $create->setAccessible(true);
         $create->invoke($generator, null, null);
 
         $files = new \ReflectionProperty($generator, 'temporaryFiles');
-        (\PHP_VERSION_ID < 80100) && $files->setAccessible(true);
         $this->assertCount(1, $files->getValue($generator));
 
         $remove = new \ReflectionMethod($generator, 'removeTemporaryFiles');
-        (\PHP_VERSION_ID < 80100) && $remove->setAccessible(true);
         $remove->invoke($generator);
     }
 
@@ -873,11 +853,9 @@ class AbstractGeneratorTest extends TestCase
         ;
 
         $files = new \ReflectionProperty($generator, 'temporaryFiles');
-        (\PHP_VERSION_ID < 80100) && $files->setAccessible(true);
         $files->setValue($generator, [__FILE__]);
 
         $remove = new \ReflectionMethod($generator, 'removeTemporaryFiles');
-        (\PHP_VERSION_ID < 80100) && $remove->setAccessible(true);
         $remove->invoke($generator);
     }
 
@@ -901,15 +879,12 @@ class AbstractGeneratorTest extends TestCase
         ;
 
         $create = new \ReflectionMethod($generator, 'createTemporaryFile');
-        (\PHP_VERSION_ID < 80100) && $create->setAccessible(true);
         $create->invoke($generator, '<html/>', 'html');
 
         $files = new \ReflectionProperty($generator, 'temporaryFiles');
-        (\PHP_VERSION_ID < 80100) && $files->setAccessible(true);
         $this->assertCount(1, $files->getValue($generator));
 
         $remove = new \ReflectionMethod($generator, 'removeTemporaryFiles');
-        (\PHP_VERSION_ID < 80100) && $remove->setAccessible(true);
         $remove->invoke($generator);
     }
 
@@ -966,7 +941,7 @@ class AbstractGeneratorTest extends TestCase
         $paths = \explode(\PATH_SEPARATOR, \getenv('PATH') ?: '');
         foreach ($paths as $path) {
             // we need this for XAMPP (Windows)
-            if (false !== \strpos($path, 'php.exe') && isset($_SERVER['WINDIR']) && \file_exists($path) && \is_file($path)) {
+            if (\str_contains($path, 'php.exe') && isset($_SERVER['WINDIR']) && \file_exists($path) && \is_file($path)) {
                 return $path;
             }
             $php_executable = $path . \DIRECTORY_SEPARATOR . 'php' . (isset($_SERVER['WINDIR']) ? '.exe' : '');
@@ -989,7 +964,6 @@ class AbstractGeneratorTest extends TestCase
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
         $r = new \ReflectionMethod($media, 'isProtocolAllowed');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $this->assertSame($expected, $r->invokeArgs($media, [$filename]));
     }
@@ -1022,7 +996,6 @@ class AbstractGeneratorTest extends TestCase
     {
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
         $r = new \ReflectionMethod($media, 'prepareOutput');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The output file scheme is not supported.');
@@ -1067,7 +1040,6 @@ class AbstractGeneratorTest extends TestCase
         $this->expectExceptionMessage('Could not read file \'/nonexistent/path/to/file.txt\' content.');
 
         $r = new \ReflectionMethod($media, 'getFileContents');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         @$r->invokeArgs($media, ['/nonexistent/path/to/file.txt']);
     }
@@ -1083,7 +1055,6 @@ class AbstractGeneratorTest extends TestCase
         $this->expectExceptionMessage('Could not read file \'/nonexistent/path/to/file.txt\' size.');
 
         $r = new \ReflectionMethod($media, 'filesize');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         @$r->invokeArgs($media, ['/nonexistent/path/to/file.txt']);
     }
@@ -1182,7 +1153,6 @@ class AbstractGeneratorTest extends TestCase
         ;
 
         $r = new \ReflectionMethod($media, 'executeCommand');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         // Execute a simple command that should succeed
         $result = $r->invokeArgs($media, [[\PHP_BINARY, '-r', 'echo "test";']]);
@@ -1205,7 +1175,6 @@ class AbstractGeneratorTest extends TestCase
         ;
 
         $r = new \ReflectionMethod($media, 'executeCommand');
-        (\PHP_VERSION_ID < 80100) && $r->setAccessible(true);
 
         // Execute a command that should fail
         $result = $r->invokeArgs($media, [[\PHP_BINARY, '-r', 'exit(1);']]);

@@ -24,6 +24,5 @@ return (new PhpCsFixer\Config())
             'on_multiline' => 'ensure_fully_multiline',
             'keep_multiple_spaces_after_comma' => false,
         ],
-        'modernize_strpos' => false, // Requires PHP 8.0+, but we support PHP 7.4
     ])
 ;

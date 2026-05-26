@@ -90,7 +90,6 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
-        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
         $this->expectException(\RuntimeException::class);
@@ -204,7 +203,6 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
-        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
         $this->assertCount(1, $pdf->temporaryFiles);
         $file = \reset($pdf->temporaryFiles);
@@ -221,7 +219,6 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'buildCommand');
-        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
 
         $command = $method->invoke($pdf, \PHP_BINARY, 'input.html', 'output.pdf', [
             'dpi' => 300,
@@ -243,7 +240,6 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'buildCommand');
-        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
 
         $command = $method->invoke($pdf, \PHP_BINARY, 'input.html', 'output.pdf', [
             'format' => 'pdf',
@@ -332,7 +328,6 @@ class PdfTest extends TestCase
         $maliciousBinary = 'weasyprint; touch /tmp/pwn; #';
         $pdf = new Pdf($maliciousBinary);
         $method = new \ReflectionMethod($pdf, 'buildCommand');
-        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf("The binary '%s' is not executable.", $maliciousBinary));
@@ -347,7 +342,6 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'isOptionUrl');
-        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
 
         $this->assertTrue($method->invoke($pdf, 'https://example.com/style.css'));
         $this->assertTrue($method->invoke($pdf, 'http://example.com/style.css'));
@@ -365,7 +359,6 @@ class PdfTest extends TestCase
     {
         $pdf = new Pdf('weasyprint', [], null, ['http', 'https', 'file']);
         $method = new \ReflectionMethod($pdf, 'isOptionUrl');
-        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
 
         $this->assertTrue($method->invoke($pdf, 'file:///etc/passwd'));
         $this->assertFalse($method->invoke($pdf, 'php://filter/resource=/etc/passwd'));
@@ -378,7 +371,6 @@ class PdfTest extends TestCase
     {
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'handleArrayOptions');
-        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
 
         $payload = 'php://filter/convert.base64-encode/resource=/etc/passwd';
 
