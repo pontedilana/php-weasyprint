@@ -74,6 +74,19 @@ $pdf->setOption('stylesheet', ['/path/to/first-style.css', '/path/to/second-styl
 $pdf->setOption('attachment', ['/path/to/image.png', '/path/to/logo.jpg']);
 ```
 
+For options whose value is constrained to a fixed set, you can pass a backed enum
+instead of a raw string (it is converted to its scalar value automatically):
+
+```php
+use Pontedilana\PhpWeasyPrint\Enum\MediaType;
+use Pontedilana\PhpWeasyPrint\Enum\PdfVariant;
+use Pontedilana\PhpWeasyPrint\Enum\PdfVersion;
+
+$pdf->setOption('media-type', MediaType::Screen);
+$pdf->setOption('pdf-variant', PdfVariant::PdfA3b);
+$pdf->setOption('pdf-version', PdfVersion::Pdf17);
+```
+
 ### Allowed URL schemes
 
 Options that accept URLs (e.g. `attachment`) may be fetched server-side by the library.

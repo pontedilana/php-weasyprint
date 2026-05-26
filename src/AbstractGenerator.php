@@ -41,8 +41,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     private ?string $binary = null;
 
     /**
-     * @param array<string, bool|int|string|array|null> $options
-     * @param array<string, mixed>|null                 $env
+     * @param array<string, bool|int|string|array|\BackedEnum|null> $options
+     * @param array<string, mixed>|null                             $env
      *
      * @note
      *  This class sets a default timeout on the process to prevent
@@ -402,9 +402,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Returns the command for the given input and output files.
      *
-     * @param string                                    $input   The input file
-     * @param string                                    $output  The ouput file
-     * @param array<string, bool|int|string|array|null> $options An optional array of options that will be used only for this command
+     * @param string                                                $input   The input file
+     * @param string                                                $output  The ouput file
+     * @param array<string, bool|int|string|array|\BackedEnum|null> $options An optional array of options that will be used only for this command
      */
     public function getCommand(string $input, string $output, array $options = []): string
     {
@@ -498,8 +498,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Sets an option. Be aware that option values are NOT validated and that
      * it is your responsibility to validate user inputs.
      *
-     * @param string                     $name  The option to set
-     * @param bool|int|string|array|null $value The value (NULL to unset)
+     * @param string                                 $name  The option to set
+     * @param bool|int|string|array|\BackedEnum|null $value The value (NULL to unset). Backed enums (e.g. PdfVariant, MediaType) are accepted and converted to their scalar value.
      *
      * @throws \InvalidArgumentException
      */
@@ -508,6 +508,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         if (!\array_key_exists($name, $this->options)) {
             throw new \InvalidArgumentException(\sprintf('The option \'%s\' does not exist.', $name));
         }
+
+        $value = $this->normalizeOptionValue($value);
 
         $this->validateOptionValue($name, $value);
 
@@ -521,7 +523,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     /**
      * Sets an array of options.
      *
-     * @param array<string, bool|int|string|array|null> $options An associative array of options as name/value
+     * @param array<string, bool|int|string|array|\BackedEnum|null> $options An associative array of options as name/value
      */
     public function setOptions(array $options): self
     {
@@ -579,7 +581,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Merges the given array of options to the instance options and returns
      * the result options array. It does NOT change the instance options.
      *
-     * @param array<string, bool|int|string|array|null> $options
+     * @param array<string, bool|int|string|array|\BackedEnum|null> $options
      *
      * @return array<string, bool|int|string|array|null>
      *
@@ -594,12 +596,38 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
                 throw new \InvalidArgumentException(\sprintf('The option \'%s\' does not exist.', $name));
             }
 
+            $value = $this->normalizeOptionValue($value);
+
             $this->validateOptionValue($name, $value);
 
             $mergedOptions[$name] = $value;
         }
 
         return $mergedOptions;
+    }
+
+    /**
+     * Converts backed enum option values (and arrays of them) to their scalar
+     * value, so the rest of the pipeline only ever deals with scalars.
+     *
+     * @param bool|int|string|array|\BackedEnum|null $value
+     *
+     * @return bool|int|string|array|null
+     */
+    private function normalizeOptionValue($value)
+    {
+        if ($value instanceof \BackedEnum) {
+            return $value->value;
+        }
+
+        if (\is_array($value)) {
+            return \array_map(
+                static fn($item) => $item instanceof \BackedEnum ? $item->value : $item,
+                $value
+            );
+        }
+
+        return $value;
     }
 
     /**

@@ -3,6 +3,9 @@
 namespace Pontedilana\PhpWeasyPrint\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Pontedilana\PhpWeasyPrint\Enum\MediaType;
+use Pontedilana\PhpWeasyPrint\Enum\PdfVariant;
+use Pontedilana\PhpWeasyPrint\Enum\PdfVersion;
 use Pontedilana\PhpWeasyPrint\Pdf;
 use Pontedilana\PhpWeasyPrint\Tests\PdfSpy;
 use Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues;
@@ -273,6 +276,39 @@ class PdfTest extends TestCase
 
         $q = self::SHELL_ARG_QUOTE_REGEX;
         $this->assertMatchesRegularExpression('/--pdf-variant ' . $q . 'pdf\/a-3b' . $q . '/', $pdf->getLastCommand());
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setOption
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::normalizeOptionValue
+     */
+    public function testSetOptionAcceptsBackedEnumValues(): void
+    {
+        $pdf = new PdfSpy();
+        $pdf->setOption('pdf-variant', PdfVariant::PdfA3b);
+        $pdf->setOption('media-type', MediaType::Screen);
+        $pdf->setOption('pdf-version', PdfVersion::Pdf17);
+        $pdf->getOutputFromHtml('<html></html>');
+
+        $q = self::SHELL_ARG_QUOTE_REGEX;
+        $this->assertMatchesRegularExpression('/--pdf-variant ' . $q . 'pdf\/a-3b' . $q . '/', $pdf->getLastCommand());
+        $this->assertMatchesRegularExpression('/--media-type ' . $q . 'screen' . $q . '/', $pdf->getLastCommand());
+        $this->assertMatchesRegularExpression('/--pdf-version ' . $q . '1\.7' . $q . '/', $pdf->getLastCommand());
+        $this->assertSame('pdf/a-3b', $pdf->getOptions()['pdf-variant']);
+        $this->assertSame('1.7', $pdf->getOptions()['pdf-version']);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::mergeOptions
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::normalizeOptionValue
+     */
+    public function testPerCallOptionAcceptsBackedEnum(): void
+    {
+        $pdf = new PdfSpy();
+        $pdf->getOutputFromHtml('<html></html>', ['pdf-variant' => PdfVariant::PdfUa1]);
+
+        $q = self::SHELL_ARG_QUOTE_REGEX;
+        $this->assertMatchesRegularExpression('/--pdf-variant ' . $q . 'pdf\/ua-1' . $q . '/', $pdf->getLastCommand());
     }
 
     /**

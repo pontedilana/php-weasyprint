@@ -2,40 +2,29 @@
 
 namespace Pontedilana\PhpWeasyPrint;
 
+use Pontedilana\PhpWeasyPrint\Enum\PdfVariant;
+
 /**
  * Single source of truth for WeasyPrint CLI options whose value is constrained
  * to a fixed set (argparse "choices"). Validating option values against this
  * allow-list prevents invalid values from reaching the command line and acts as
  * defense-in-depth against argument/command injection through those options.
  *
- * Only options that WeasyPrint itself restricts to a closed set are listed here;
- * free-string and numeric options are not.
+ * The allowed values are derived from the backed enums in the Enum namespace
+ * (e.g. PdfVariant), which are the canonical definition. Only options that
+ * WeasyPrint itself restricts to a closed set are listed here; free-string and
+ * numeric options are not.
  *
  * @author  Manuel Dalla Lana <manuel@pontedilana.it>
  */
 final class WeasyPrintOptionValues
 {
     /**
-     * Option name => list of values WeasyPrint accepts as CLI "choices".
-     *
-     * @var array<string, list<string>>
-     */
-    private const ALLOWED_VALUES = [
-        // --pdf-variant choices (WeasyPrint 68.1)
-        'pdf-variant' => [
-            'pdf/a-1b', 'pdf/a-2b', 'pdf/a-3b', 'pdf/a-2u', 'pdf/a-3u', 'pdf/a-4u',
-            'pdf/a-1a', 'pdf/a-2a', 'pdf/a-3a', 'pdf/a-4e', 'pdf/a-4f',
-            'pdf/ua-1', 'pdf/ua-2', 'pdf/x-1a', 'pdf/x-3', 'pdf/x-4', 'pdf/x-5g',
-            'debug',
-        ],
-    ];
-
-    /**
      * Whether the given option has a constrained set of allowed values.
      */
     public static function isConstrained(string $option): bool
     {
-        return isset(self::ALLOWED_VALUES[$option]);
+        return [] !== self::getAllowedValues($option);
     }
 
     /**
@@ -43,7 +32,12 @@ final class WeasyPrintOptionValues
      */
     public static function getAllowedValues(string $option): array
     {
-        return self::ALLOWED_VALUES[$option] ?? [];
+        switch ($option) {
+            case 'pdf-variant':
+                return \array_map(static fn(PdfVariant $case): string => $case->value, PdfVariant::cases());
+            default:
+                return [];
+        }
     }
 
     /**
@@ -54,10 +48,12 @@ final class WeasyPrintOptionValues
      */
     public static function isAllowed(string $option, $value): bool
     {
-        if (!isset(self::ALLOWED_VALUES[$option])) {
+        $allowedValues = self::getAllowedValues($option);
+
+        if ([] === $allowedValues) {
             return true;
         }
 
-        return \in_array((string)$value, self::ALLOWED_VALUES[$option], true);
+        return \in_array((string)$value, $allowedValues, true);
     }
 }
