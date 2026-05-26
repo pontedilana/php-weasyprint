@@ -28,8 +28,6 @@ final class WeasyPrintOptionValues
             'pdf/ua-1', 'pdf/ua-2', 'pdf/x-1a', 'pdf/x-3', 'pdf/x-4', 'pdf/x-5g',
             'debug',
         ],
-        // --format choices (removed after WeasyPrint 53.0b2, but still accepted for backward compatibility)
-        'format' => ['pdf', 'png'],
     ];
 
     /**

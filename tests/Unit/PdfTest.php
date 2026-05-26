@@ -157,8 +157,8 @@ class PdfTest extends TestCase
             ],
 
             '8 - set integer, string, and boolean options' => [
-                ['pdf-variant' => 'pdf/ua-1', 'dpi' => 300, 'timeout' => 60, 'srgb' => true, 'resolution' => 100],
-                '/' . $q . 'emptyBinary' . $q . ' --pdf-variant ' . $q . 'pdf\/ua-1' . $q . ' --dpi 300 --timeout 60 --srgb --resolution 100 ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+                ['pdf-variant' => 'pdf/ua-1', 'dpi' => 300, 'timeout' => 60, 'srgb' => true],
+                '/' . $q . 'emptyBinary' . $q . ' --pdf-variant ' . $q . 'pdf\/ua-1' . $q . ' --dpi 300 --timeout 60 --srgb ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
             '9 - new boolean options' => [
                 ['no-http-redirects' => true, 'fail-on-http-errors' => true, 'verbose' => true, 'debug' => true, 'info' => true, 'version' => true],
@@ -224,30 +224,11 @@ class PdfTest extends TestCase
             'dpi' => 300,
             'jpeg-quality' => 85,
             'timeout' => 60,
-            'resolution' => 100,
         ]);
 
         $this->assertStringContainsString('--dpi 300', $command);
         $this->assertStringContainsString('--jpeg-quality 85', $command);
         $this->assertStringContainsString('--timeout 60', $command);
-        $this->assertStringContainsString('--resolution 100', $command);
-    }
-
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::buildCommand
-     */
-    public function testBuildCommandHandlesDeprecatedFormatOption(): void
-    {
-        $pdf = new PdfSpy();
-        $method = new \ReflectionMethod($pdf, 'buildCommand');
-
-        $command = $method->invoke($pdf, \PHP_BINARY, 'input.html', 'output.pdf', [
-            'format' => 'pdf',
-        ]);
-
-        // The format value must be shell-escaped like any other scalar option.
-        $q = self::SHELL_ARG_QUOTE_REGEX;
-        $this->assertMatchesRegularExpression('/--format ' . $q . 'pdf' . $q . '/', $command);
     }
 
     /**
@@ -260,9 +241,9 @@ class PdfTest extends TestCase
         $pdf = new PdfSpy();
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("The value 'pdf; touch /tmp/pwn' is not allowed for option 'format'.");
+        $this->expectExceptionMessage("The value 'pdf/a-3b; touch /tmp/pwn' is not allowed for option 'pdf-variant'.");
 
-        $pdf->setOption('format', 'pdf; touch /tmp/pwn');
+        $pdf->setOption('pdf-variant', 'pdf/a-3b; touch /tmp/pwn');
     }
 
     /**
@@ -287,12 +268,10 @@ class PdfTest extends TestCase
     public function testWhitelistedValuesAreAccepted(): void
     {
         $pdf = new PdfSpy();
-        $pdf->setOption('format', 'png');
         $pdf->setOption('pdf-variant', 'pdf/a-3b');
         $pdf->getOutputFromHtml('<html></html>');
 
         $q = self::SHELL_ARG_QUOTE_REGEX;
-        $this->assertMatchesRegularExpression('/--format ' . $q . 'png' . $q . '/', $pdf->getLastCommand());
         $this->assertMatchesRegularExpression('/--pdf-variant ' . $q . 'pdf\/a-3b' . $q . '/', $pdf->getLastCommand());
     }
 
@@ -317,7 +296,7 @@ class PdfTest extends TestCase
     {
         $this->assertTrue(WeasyPrintOptionValues::isAllowed('encoding', 'anything-goes'));
         $this->assertFalse(WeasyPrintOptionValues::isConstrained('encoding'));
-        $this->assertTrue(WeasyPrintOptionValues::isConstrained('format'));
+        $this->assertTrue(WeasyPrintOptionValues::isConstrained('pdf-variant'));
     }
 
     /**

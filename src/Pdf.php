@@ -196,10 +196,6 @@ class Pdf extends AbstractGenerator
             'version' => null,
             'no-http-redirects' => null,
             'fail-on-http-errors' => null,
-            // Deprecated
-            'format' => null, // deprecated in WeasyPrint 53.0b2
-            'resolution' => null, // deprecated - png only
-            'optimize-size' => null, // added in WeasyPrint 53.0b2, deprecated in 59.0b1
         ]);
     }
 
@@ -233,7 +229,6 @@ class Pdf extends AbstractGenerator
                 switch ($key) {
                     case 'dpi':
                     case 'jpeg-quality':
-                    case 'resolution':
                     case 'timeout':
                         $command .= ' --' . $key . ' ' . (int)$option;
                         break;

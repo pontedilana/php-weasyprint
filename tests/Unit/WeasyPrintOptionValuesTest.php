@@ -12,28 +12,26 @@ class WeasyPrintOptionValuesTest extends TestCase
 {
     public function testIsAllowedAcceptsWhitelistedValue(): void
     {
-        $this->assertTrue(WeasyPrintOptionValues::isAllowed('format', 'pdf'));
-        $this->assertTrue(WeasyPrintOptionValues::isAllowed('format', 'png'));
         $this->assertTrue(WeasyPrintOptionValues::isAllowed('pdf-variant', 'pdf/a-3b'));
+        $this->assertTrue(WeasyPrintOptionValues::isAllowed('pdf-variant', 'pdf/ua-1'));
     }
 
     public function testIsAllowedRejectsValueOutsideWhitelist(): void
     {
-        $this->assertFalse(WeasyPrintOptionValues::isAllowed('format', 'pdf; touch /tmp/x'));
         $this->assertFalse(WeasyPrintOptionValues::isAllowed('pdf-variant', 'pdf/bogus'));
+        $this->assertFalse(WeasyPrintOptionValues::isAllowed('pdf-variant', 'pdf/a-3b; touch /tmp/x'));
     }
 
     public function testIsAllowedIsCaseSensitive(): void
     {
         // WeasyPrint argparse "choices" are case-sensitive: must not be normalized.
-        $this->assertFalse(WeasyPrintOptionValues::isAllowed('format', 'PDF'));
         $this->assertFalse(WeasyPrintOptionValues::isAllowed('pdf-variant', 'PDF/A-3B'));
     }
 
     public function testIsAllowedDoesNotCoerceToFalsePositive(): void
     {
-        $this->assertFalse(WeasyPrintOptionValues::isAllowed('format', 0));
-        $this->assertFalse(WeasyPrintOptionValues::isAllowed('format', 123));
+        $this->assertFalse(WeasyPrintOptionValues::isAllowed('pdf-variant', 0));
+        $this->assertFalse(WeasyPrintOptionValues::isAllowed('pdf-variant', 123));
     }
 
     public function testUnconstrainedOptionAllowsAnyValue(): void
@@ -44,7 +42,6 @@ class WeasyPrintOptionValuesTest extends TestCase
 
     public function testIsConstrained(): void
     {
-        $this->assertTrue(WeasyPrintOptionValues::isConstrained('format'));
         $this->assertTrue(WeasyPrintOptionValues::isConstrained('pdf-variant'));
         $this->assertFalse(WeasyPrintOptionValues::isConstrained('encoding'));
         $this->assertFalse(WeasyPrintOptionValues::isConstrained('does-not-exist'));
@@ -52,7 +49,6 @@ class WeasyPrintOptionValuesTest extends TestCase
 
     public function testGetAllowedValues(): void
     {
-        $this->assertSame(['pdf', 'png'], WeasyPrintOptionValues::getAllowedValues('format'));
         $this->assertContains('pdf/a-3b', WeasyPrintOptionValues::getAllowedValues('pdf-variant'));
         $this->assertSame([], WeasyPrintOptionValues::getAllowedValues('encoding'));
     }

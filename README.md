@@ -11,6 +11,8 @@ See "[Differences with Snappy](#differences-with-snappy)" section to see how the
 ## Requirements
 
 * PHP 8.3, 8.4 or 8.5
+* WeasyPrint 60 or greater
+
 ## Installation using [Composer](https://getcomposer.org/)
 
 ```bash
