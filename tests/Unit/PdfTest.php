@@ -32,7 +32,7 @@ class PdfTest extends TestCase
 
         $htmlFiles = new \CallbackFilterIterator(
             new \DirectoryIterator(__DIR__),
-            function($filename) {
+            static function($filename) {
                 return 1 === \preg_match('/\.html$/', $filename);
             }
         );
@@ -161,6 +161,10 @@ class PdfTest extends TestCase
             '9 - new boolean options' => [
                 ['no-http-redirects' => true, 'fail-on-http-errors' => true, 'verbose' => true, 'debug' => true, 'info' => true, 'version' => true],
                 '/' . $q . 'emptyBinary' . $q . ' --timeout \d* --info --verbose --debug --version --no-http-redirects --fail-on-http-errors ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
+            ],
+            '10 - output intent option' => [
+                ['output-intent' => 'device-cmyk'],
+                '/' . $q . 'emptyBinary' . $q . ' --timeout \d* --output-intent ' . $q . 'device-cmyk' . $q . ' ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
         ];
     }
