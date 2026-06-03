@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 2.7.0 - 2026-06-03
+### Added
+- Support WeasyPrint 69.0 new `--output-intent` option
+
 ## 2.6.0 - 2026-05-25
 ### Security
 - Fix potential SSRF and local file disclosure: option URLs are fetched server-side only when their scheme is allowed (`http`, `https` by default, configurable via the new `$allowedSchemes` constructor argument)
