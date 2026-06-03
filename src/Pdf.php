@@ -185,7 +185,8 @@ class Pdf extends AbstractGenerator
             'optimize-images' => null, // no longer deprecated in WeasyPrint 59.0b1
             'cache-folder' => null, // added in WeasyPrint 59.0b1
             'timeout' => null, // added in WeasyPrint 60.0
-            'srgb' => null, // added in WeasyPrint 63.0
+            'srgb' => null, // added in WeasyPrint 63.0, replaced by output-intent in 69.0
+            'output-intent' => null, // added in WeasyPrint 69.0
             'allowed-protocols' => null, // added in WeasyPrint 67.0
             'attachment-relationship' => null, // added in WeasyPrint 68.0
             'xmp-metadata' => null, // added in WeasyPrint 68.0

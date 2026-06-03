@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 - Validate option values constrained by WeasyPrint to a fixed set (e.g. `pdf-variant`) against an allow-list (`WeasyPrintOptionValues`); invalid values are rejected by `setOption()` as defense-in-depth
 - Backed enums `Enum\PdfVariant`, `Enum\MediaType` and `Enum\PdfVersion` for the most common option values; `setOption()`/`setOptions()` and per-call options now accept a `BackedEnum` and convert it to its scalar value. `WeasyPrintOptionValues` derives its allow-list from `PdfVariant` (`PdfVersion` is a convenience only — WeasyPrint does not constrain `pdf-version`)
 - New `buildCommandArray()` and `checkBinary()` protected methods on `AbstractGenerator`
+- Support WeasyPrint 69.0 new `--output-intent` option
 
 ### Removed
 - **[BC break]** Drop support for PHP 7.4, 8.0, 8.1 and 8.2; the minimum required version is now PHP 8.3
