@@ -511,7 +511,7 @@ class AbstractGeneratorTest extends TestCase
                 'baz' => 'bat',
             ],
             $mergedOptions,
-            '->mergeOptions() merges an option to the instance ones and returns the result options array'
+            '->mergeOptions() merges an option with the instance options and returns the resulting options array'
         );
 
         $this->assertEquals(
@@ -528,7 +528,7 @@ class AbstractGeneratorTest extends TestCase
                 'baz' => 'bag',
             ],
             $mergedOptions,
-            '->mergeOptions() merges many options to the instance ones and returns the result options array'
+            '->mergeOptions() merges multiple options with the instance options and returns the resulting options array'
         );
     }
 
@@ -1037,7 +1037,7 @@ class AbstractGeneratorTest extends TestCase
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
         $this->expectException(\Pontedilana\PhpWeasyPrint\Exception\CouldNotReadFileContentException::class);
-        $this->expectExceptionMessage('Could not read file \'/nonexistent/path/to/file.txt\' content.');
+        $this->expectExceptionMessage('Could not read the contents of file \'/nonexistent/path/to/file.txt\'.');
 
         $r = new \ReflectionMethod($media, 'getFileContents');
 
@@ -1052,7 +1052,7 @@ class AbstractGeneratorTest extends TestCase
         $media = $this->getMockForAbstractClass(AbstractGenerator::class, [], '', false);
 
         $this->expectException(\Pontedilana\PhpWeasyPrint\Exception\CouldNotReadFileSizeException::class);
-        $this->expectExceptionMessage('Could not read file \'/nonexistent/path/to/file.txt\' size.');
+        $this->expectExceptionMessage('Could not read the size of file \'/nonexistent/path/to/file.txt\'.');
 
         $r = new \ReflectionMethod($media, 'filesize');
 

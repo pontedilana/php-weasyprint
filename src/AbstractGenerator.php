@@ -11,7 +11,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Process\Process;
 
 /**
- *  Base generator class for medias.
+ *  Base class for media generators.
  *
  * @author  Matthieu Bontemps <matthieu.bontemps@knplabs.com>
  * @author  Antoine Hérault <antoine.herault@knplabs.com>
@@ -174,8 +174,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Builds the command string.
      *
      * @param string                                    $binary  The binary path/name
-     * @param string                                    $input   Url or file location of the page to process
-     * @param string                                    $output  File location to the pdf-or-image-to-be
+     * @param string                                    $input   URL or path of the input document
+     * @param string                                    $output  Path to the output file
      * @param array<string, bool|int|string|array|null> $options An array of options
      */
     protected function buildCommand(string $binary, string $input, string $output, array $options = []): string
@@ -211,8 +211,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * metacharacter can be interpreted and no escaping is required.
      *
      * @param string                                    $binary  The binary path/name
-     * @param string                                    $input   Url or file location of the page to process
-     * @param string                                    $output  File location to the pdf-or-image-to-be
+     * @param string                                    $input   URL or path of the input document
+     * @param string                                    $output  Path to the output file
      * @param array<string, bool|int|string|array|null> $options An array of options
      *
      * @return list<string>
@@ -275,8 +275,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     }
 
     /**
-     * Executes the given command (as an argument list) without a shell and
-     * returns the complete output as a string.
+     * Executes the command without a shell and returns the exit code,
+     * standard output, and standard error.
      *
      * @param list<string> $command
      *
@@ -320,7 +320,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
                 throw new FileAlreadyExistsException(\sprintf('The output file \'%s\' already exists.', $filename));
             }
             if (!$this->unlink($filename)) {
-                throw new \RuntimeException(\sprintf('Could not delete already existing output file \'%s\'.', $filename));
+                throw new \RuntimeException(\sprintf('Could not delete the existing output file \'%s\'.', $filename));
             }
         } elseif (!$this->isDir($directory) && !$this->mkdir($directory)) {
             throw new \RuntimeException(\sprintf('The output file\'s directory \'%s\' could not be created.', $directory));
@@ -403,7 +403,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      * Returns the command for the given input and output files.
      *
      * @param string                                                $input   The input file
-     * @param string                                                $output  The ouput file
+     * @param string                                                $output  The output file
      * @param array<string, bool|int|string|array|\BackedEnum|null> $options An optional array of options that will be used only for this command
      */
     public function getCommand(string $input, string $output, array $options = []): string
@@ -441,7 +441,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     }
 
     /**
-     * Get TemporaryFolder.
+     * Gets the temporary folder.
      */
     public function getTemporaryFolder(): string
     {
@@ -449,7 +449,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     }
 
     /**
-     * Set temporaryFolder.
+     * Sets the temporary folder.
      */
     public function setTemporaryFolder(string $temporaryFolder): self
     {
@@ -495,8 +495,9 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     }
 
     /**
-     * Sets an option. Be aware that option values are NOT validated and that
-     * it is your responsibility to validate user inputs.
+     * Sets an option. Value validation is delegated to the concrete generator
+     * through validateOptionValue(); the default implementation does nothing.
+     * Callers remain responsible for validating user input.
      *
      * @param string                                 $name  The option to set
      * @param bool|int|string|array|\BackedEnum|null $value The value (NULL to unset). Backed enums (e.g. PdfVariant, MediaType) are accepted and converted to their scalar value.
@@ -578,8 +579,8 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     }
 
     /**
-     * Merges the given array of options to the instance options and returns
-     * the result options array. It does NOT change the instance options.
+     * Merges the given array of options with the instance options and returns
+     * the resulting options array. It does NOT change the instance options.
      *
      * @param array<string, bool|int|string|array|\BackedEnum|null> $options
      *
@@ -643,7 +644,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     }
 
     /**
-     * Reset all options to their initial values.
+     * Resets all options to their initial values.
      */
     public function resetOptions(): void
     {
@@ -685,7 +686,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     protected function checkProcessStatus(?int $status, string $stdout, string $stderr, string $command): void
     {
         if (null === $status) {
-            throw new \RuntimeException(\sprintf('The command is not terminated.' . "\n" . 'stderr: "%s"' . "\n" . 'stdout: "%s"' . "\n" . 'command: %s', $stderr, $stdout, $command));
+            throw new \RuntimeException(\sprintf('The process exit code is unavailable.' . "\n" . 'stderr: "%s"' . "\n" . 'stdout: "%s"' . "\n" . 'command: %s', $stderr, $stdout, $command));
         }
 
         if (0 !== $status && '' !== $stderr) {
@@ -701,7 +702,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         $fileContent = \file_get_contents($filename);
 
         if (false === $fileContent) {
-            throw new CouldNotReadFileContentException(\sprintf('Could not read file \'%s\' content.', $filename));
+            throw new CouldNotReadFileContentException(\sprintf('Could not read the contents of file \'%s\'.', $filename));
         }
 
         return $fileContent;
@@ -731,7 +732,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         $filesize = \filesize($filename);
 
         if (false === $filesize) {
-            throw new CouldNotReadFileSizeException(\sprintf('Could not read file \'%s\' size.', $filename));
+            throw new CouldNotReadFileSizeException(\sprintf('Could not read the size of file \'%s\'.', $filename));
         }
 
         return $filesize;

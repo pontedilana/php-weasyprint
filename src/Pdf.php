@@ -3,7 +3,7 @@
 namespace Pontedilana\PhpWeasyPrint;
 
 /**
- * Use this class to transform a html/an url to a pdf.
+ * Converts an HTML document to a PDF.
  *
  * @author  Manuel Dalla Lana <manuel@pontedilana.it>
  */
@@ -123,7 +123,7 @@ class Pdf extends AbstractGenerator
     }
 
     /**
-     * Convert option content or url to file if it is necessary.
+     * Checks whether the option value is a URL with an allowed scheme.
      *
      * @param mixed $option
      */
@@ -205,8 +205,8 @@ class Pdf extends AbstractGenerator
      * Builds the command string.
      *
      * @param string                                    $binary  The binary path/name
-     * @param string                                    $input   Url or file location of the page to process
-     * @param string                                    $output  File location to the pdf-or-image-to-be
+     * @param string                                    $input   URL or path of the input document
+     * @param string                                    $output  Path to the output file
      * @param array<string, bool|int|string|array|null> $options An array of options
      */
     protected function buildCommand(string $binary, string $input, string $output, array $options = []): string

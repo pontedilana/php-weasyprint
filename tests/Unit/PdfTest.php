@@ -154,7 +154,7 @@ class PdfTest extends TestCase
                 '/' . $q . 'emptyBinary' . $q . ' --attachment ' . $q . '.*php_weasyprint.*\.temp' . $q . ' --timeout \d* ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
 
-            '7 - save the content of multiple attachments URL to files and pass those filenames' => [
+            '7 - save the content of multiple attachment URLs to files and pass those filenames' => [
                 ['attachment' => ['https://www.google.com/favicon.ico', 'https://github.githubassets.com/favicons/favicon.svg']],
                 '/' . $q . 'emptyBinary' . $q . ' --attachment ' . $q . '.*php_weasyprint.*\.temp' . $q . ' --attachment ' . $q . '.*php_weasyprint.*\.temp' . $q . ' --timeout \d* ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
