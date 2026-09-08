@@ -14,9 +14,10 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 ### Removed
 - **[BC break]** Drop support for PHP 7.4, 8.0, 8.1 and 8.2; the minimum required version is now PHP 8.3
 - **[BC break]** Drop support for Symfony 5.4 (end of life); supported `symfony/process` versions are now 6.4, 7.4 and 8.0
-- **[BC break]** Remove the deprecated WeasyPrint options `format`, `resolution` and `optimize-size`, which are no longer supported by WeasyPrint 60+ (PNG output and these options were removed upstream). Setting them now throws an `InvalidArgumentException`
+- **[BC break]** Remove the deprecated WeasyPrint options `format` and `resolution`, which are no longer supported by WeasyPrint 60+ (PNG output and these options were removed upstream). Setting them now throws an `InvalidArgumentException`
 
 ### Changed
+- Retain the deprecated `optimize-size` option for compatibility with WeasyPrint 60; it was deprecated in WeasyPrint 59 and removed in WeasyPrint 61
 - **[BC break]** The WeasyPrint process is now executed from an argument array (`new Process([...])`) instead of a shell command string (`Process::fromShellCommandline()`). Execution no longer goes through a shell, removing shell-command injection as a class of vulnerability. The escaped string form (`getCommand()` / `buildCommand()`) is retained for logging and exception messages only.
 - **[BC break]** `executeCommand()` signature changed from `executeCommand(string $command)` to `executeCommand(array $command)`. Subclasses overriding it must be updated.
 - **[BC break]** The binary executability check moved out of `getEscapedBinary()` into the new `checkBinary()` method. Subclasses overriding `getEscapedBinary()` to bypass the check (e.g. test doubles) must override `checkBinary()` instead.
