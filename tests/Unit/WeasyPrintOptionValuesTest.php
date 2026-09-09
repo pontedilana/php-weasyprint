@@ -2,12 +2,11 @@
 
 namespace Pontedilana\PhpWeasyPrint\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues;
 
-/**
- * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
- */
+#[CoversClass(WeasyPrintOptionValues::class)]
 class WeasyPrintOptionValuesTest extends TestCase
 {
     public function testIsAllowedAcceptsWhitelistedValue(): void

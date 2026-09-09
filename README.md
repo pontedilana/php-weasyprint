@@ -172,6 +172,7 @@ Although PhpWeasyPrint and Snappy are interchangeable, there are a couple of dif
 
 ## Running tests
 
+The test suites use PHPUnit 12.5 and require PHP 8.3 or newer.
 Run `composer unit-tests` for the unit suite, which does not require network access
 or an installed WeasyPrint binary. Run `composer check-cs` and
 `composer static-analysis` for coding standards and static analysis.

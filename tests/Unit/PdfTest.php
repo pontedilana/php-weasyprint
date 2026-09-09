@@ -2,6 +2,9 @@
 
 namespace Pontedilana\PhpWeasyPrint\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\Enum\MediaType;
 use Pontedilana\PhpWeasyPrint\Enum\PdfVariant;
@@ -10,9 +13,12 @@ use Pontedilana\PhpWeasyPrint\Pdf;
 use Pontedilana\PhpWeasyPrint\Tests\PdfSpy;
 use Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues;
 
-/**
- * @covers \Pontedilana\PhpWeasyPrint\Pdf
- */
+#[CoversClass(Pdf::class)]
+#[CoversMethod(\Pontedilana\PhpWeasyPrint\AbstractGenerator::class, 'buildCommandArray')]
+#[CoversMethod(\Pontedilana\PhpWeasyPrint\AbstractGenerator::class, 'setOption')]
+#[CoversClass(WeasyPrintOptionValues::class)]
+#[CoversMethod(\Pontedilana\PhpWeasyPrint\AbstractGenerator::class, 'mergeOptions')]
+#[CoversMethod(\Pontedilana\PhpWeasyPrint\AbstractGenerator::class, 'normalizeOptionValue')]
 class PdfTest extends TestCase
 {
     // The executed command is now an argument array joined with spaces (no shell escaping),
@@ -48,9 +54,6 @@ class PdfTest extends TestCase
         }
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::__construct
-     */
     public function testCreateInstance(): void
     {
         $testObject = new Pdf();
@@ -58,9 +61,6 @@ class PdfTest extends TestCase
         $this->assertInstanceOf(Pdf::class, $testObject);
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::setTemporaryFolder
-     */
     public function testThatSomethingUsingTmpFolder(): void
     {
         $q = self::SHELL_ARG_QUOTE_REGEX;
@@ -71,9 +71,6 @@ class PdfTest extends TestCase
         $this->assertMatchesRegularExpression('/' . $q . 'emptyBinary' . $q . ' --stylesheet ' . $q . '.*' . $q . ' --timeout \d* ' . $q . '.*' . $q . ' ' . $q . '.*' . $q . '/', $testObject->getLastCommand());
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::setTemporaryFolder
-     */
     public function testThatSomethingUsingNonexistentTmpFolder(): void
     {
         $temporaryFolder = \sys_get_temp_dir() . '/i-dont-exist';
@@ -86,9 +83,6 @@ class PdfTest extends TestCase
         $this->assertDirectoryExists($temporaryFolder);
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::createTemporaryFile
-     */
     public function testRemovesLocalFilesOnError(): void
     {
         $pdf = new PdfSpy();
@@ -101,9 +95,7 @@ class PdfTest extends TestCase
         $this->assertFileDoesNotExist(\reset($pdf->temporaryFiles));
     }
 
-    /**
-     * @dataProvider dataOptions
-     */
+    #[DataProvider('dataOptions')]
     public function testOptions(array $options, string $expectedRegex): void
     {
         $testObject = new PdfSpy();
@@ -129,7 +121,7 @@ class PdfTest extends TestCase
         $this->assertSame(\file_get_contents(__DIR__ . '/../Fixture/attachment-two.txt'), \file_get_contents($attachments[1]));
     }
 
-    public function dataOptions(): array
+    public static function dataOptions(): array
     {
         $q = self::SHELL_ARG_QUOTE_REGEX;
 
@@ -219,10 +211,6 @@ class PdfTest extends TestCase
         $this->assertMatchesRegularExpression($expectedRegex, $testObject2->getLastCommand());
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::createTemporaryFile
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::__destruct
-     */
     public function testRemovesLocalFilesOnDestruct(): void
     {
         $pdf = new PdfSpy();
@@ -236,9 +224,6 @@ class PdfTest extends TestCase
         $this->assertFileDoesNotExist($file);
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::buildCommand
-     */
     public function testBuildCommandHandlesIntegerOptions(): void
     {
         $pdf = new PdfSpy();
@@ -255,9 +240,6 @@ class PdfTest extends TestCase
         $this->assertStringContainsString('--timeout 60', $command);
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::buildCommandArray
-     */
     public function testNumericOptionsMatchTheDisplayedCommand(): void
     {
         $pdf = new PdfSpy();
@@ -274,11 +256,6 @@ class PdfTest extends TestCase
         );
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setOption
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::validateOptionValue
-     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
-     */
     public function testSetOptionRejectsValueOutsideWhitelist(): void
     {
         $pdf = new PdfSpy();
@@ -289,11 +266,6 @@ class PdfTest extends TestCase
         $pdf->setOption('pdf-variant', 'pdf/a-3b; touch /tmp/pwn');
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::mergeOptions
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::validateOptionValue
-     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
-     */
     public function testPerCallOptionRejectsValueOutsideWhitelist(): void
     {
         $pdf = new PdfSpy();
@@ -304,10 +276,6 @@ class PdfTest extends TestCase
         $pdf->getOutputFromHtml('<html></html>', ['pdf-variant' => 'pdf/foo']);
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::validateOptionValue
-     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
-     */
     public function testWhitelistedValuesAreAccepted(): void
     {
         $pdf = new PdfSpy();
@@ -318,10 +286,6 @@ class PdfTest extends TestCase
         $this->assertMatchesRegularExpression('/--pdf-variant ' . $q . 'pdf\/a-3b' . $q . '/', $pdf->getLastCommand());
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setOption
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::normalizeOptionValue
-     */
     public function testSetOptionAcceptsBackedEnumValues(): void
     {
         $pdf = new PdfSpy();
@@ -338,10 +302,6 @@ class PdfTest extends TestCase
         $this->assertSame('1.7', $pdf->getOptions()['pdf-version']);
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::mergeOptions
-     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::normalizeOptionValue
-     */
     public function testPerCallOptionAcceptsBackedEnum(): void
     {
         $pdf = new PdfSpy();
@@ -351,10 +311,6 @@ class PdfTest extends TestCase
         $this->assertMatchesRegularExpression('/--pdf-variant ' . $q . 'pdf\/ua-1' . $q . '/', $pdf->getLastCommand());
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::validateOptionValue
-     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
-     */
     public function testConstrainedOptionValidatesEachArrayElement(): void
     {
         $pdf = new PdfSpy();
@@ -365,9 +321,6 @@ class PdfTest extends TestCase
         $pdf->setOption('pdf-variant', ['pdf/a-3b', 'pdf/bogus']);
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues
-     */
     public function testUnconstrainedOptionsAcceptAnyValue(): void
     {
         $this->assertTrue(WeasyPrintOptionValues::isAllowed('encoding', 'anything-goes'));
@@ -375,9 +328,6 @@ class PdfTest extends TestCase
         $this->assertTrue(WeasyPrintOptionValues::isConstrained('pdf-variant'));
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::buildCommand
-     */
     public function testBuildCommandThrowsOnNonExecutableBinary(): void
     {
         $maliciousBinary = 'weasyprint; touch /tmp/pwn; #';
@@ -390,9 +340,6 @@ class PdfTest extends TestCase
         $method->invoke($pdf, $maliciousBinary, 'input.html', 'output.pdf', []);
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::isOptionUrl
-     */
     public function testIsOptionUrlOnlyAllowsConfiguredSchemes(): void
     {
         $pdf = new PdfSpy();
@@ -406,10 +353,6 @@ class PdfTest extends TestCase
         $this->assertFalse($method->invoke($pdf, '/plain/local/path'));
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::__construct
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::isOptionUrl
-     */
     public function testAllowedSchemesCanBeConfiguredViaConstructor(): void
     {
         $pdf = new Pdf('weasyprint', [], null, ['http', 'https', 'file']);
@@ -419,9 +362,6 @@ class PdfTest extends TestCase
         $this->assertFalse($method->invoke($pdf, 'php://filter/resource=/etc/passwd'));
     }
 
-    /**
-     * @covers \Pontedilana\PhpWeasyPrint\Pdf::handleArrayOptions
-     */
     public function testAttachmentWithDisallowedSchemeIsTreatedAsContentNotFetched(): void
     {
         $pdf = new PdfSpy();

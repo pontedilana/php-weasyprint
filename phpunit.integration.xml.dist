@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.5/phpunit.xsd"
          bootstrap="vendor/autoload.php"
-         cacheResultFile=".phpunit.cache/integration-results"
-         forceCoversAnnotation="true"
          failOnRisky="true"
-         failOnWarning="true">
+         failOnWarning="true"
+         cacheDirectory=".phpunit.cache"
+         requireCoverageMetadata="true"
+         failOnDeprecation="true"
+         failOnPhpunitDeprecation="true"
+         failOnPhpunitNotice="true"
+         failOnNotice="true"
+         displayDetailsOnAllIssues="true">
     <testsuites>
         <testsuite name="PhpWeasyPrint Integration Tests">
             <directory>tests/Integration</directory>

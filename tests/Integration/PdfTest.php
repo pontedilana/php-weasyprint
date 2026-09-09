@@ -2,15 +2,14 @@
 
 namespace Pontedilana\PhpWeasyPrint\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Pontedilana\PhpWeasyPrint\Enum\PdfVariant;
 use Pontedilana\PhpWeasyPrint\Pdf;
 use Symfony\Component\Process\Process;
 
-/**
- * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator
- * @covers \Pontedilana\PhpWeasyPrint\Pdf
- */
+#[CoversClass(\Pontedilana\PhpWeasyPrint\AbstractGenerator::class)]
+#[CoversClass(Pdf::class)]
 class PdfTest extends TestCase
 {
     private Pdf $pdf;
