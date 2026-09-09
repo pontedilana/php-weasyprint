@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 - Upgrade development tooling to PHPUnit 12.5; this does not add a PHPUnit dependency to applications installing the library.
 
 ### Fixed
+- Preserve existing output files when overwriting fails; generate to a sibling temporary file and replace the destination only after process and output checks succeed.
 - Preserve per-call `null`, `false` and empty-array option overrides without restoring instance defaults or creating empty attachments and stylesheets.
 - Reject every non-zero process exit code with `RuntimeException`, including failures with empty stderr; a non-empty partial output file is no longer returned as a successful result.
 - Throw `CouldNotReadFileContentException` when an attachment URL cannot be read, instead of continuing with an empty attachment when PHP warnings are not converted to exceptions.

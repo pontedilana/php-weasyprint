@@ -147,6 +147,18 @@ string, but that string is now used **only** for logging and exception messages 
 no longer what gets executed. Existing display and logging calls remain available;
 execution customizations must use `buildCommandArray()` as described above.
 
+### Replacing existing output files
+
+With `overwrite=true`, an existing output file remains in place until generation
+succeeds. The process writes to a temporary file in the destination directory;
+only a successful process with a non-empty output replaces the original file.
+A failed generation removes the temporary output and preserves the original.
+
+The protected `prepareOutput()` method now validates the destination without
+deleting it. Subclasses overriding this method must also preserve existing files.
+During replacement, command hooks and logs refer to the temporary output path;
+`generate()` still publishes the result at the requested destination.
+
 ### Error handling corrections
 
 Every non-zero process exit code now throws `RuntimeException`, even when stderr is

@@ -49,6 +49,22 @@ class PdfTest extends TestCase
         $this->assertStringContainsString('%%EOF', $output);
     }
 
+    public function testOverwriteReplacesAnExistingDocument(): void
+    {
+        $output = \tempnam(\sys_get_temp_dir(), 'weasyprint-existing-');
+        $this->assertNotFalse($output);
+        \file_put_contents($output, 'original');
+        try {
+            $this->pdf->generateFromHtml('<!doctype html><p>Replacement</p>', $output, [], true);
+            $contents = \file_get_contents($output);
+            $this->assertNotFalse($contents);
+            $this->assertStringStartsWith('%PDF-', $contents);
+            $this->assertStringContainsString('%%EOF', $contents);
+        } finally {
+            \unlink($output);
+        }
+    }
+
     public function testGenerateWithVersionSpecificOptions(): void
     {
         $options = \version_compare($this->version, '69.0', '>=')

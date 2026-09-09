@@ -97,40 +97,55 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
             throw new \LogicException('You must define a binary prior to conversion.');
         }
 
-        $options = $this->mergeOptions($options);
-        $commandArray = $this->buildCommandArray($this->binary, $input, $output, $options);
-        // String form is kept for logging and exception messages only; the
-        // process is executed from the argument array, never through a shell.
-        $command = $this->buildCommand($this->binary, $input, $output, $options);
-
-        $this->logger->info(\sprintf('Generate from file(s) "%s" to file "%s".', $input, $output), [
-            'command' => $command,
-            'env' => $this->env,
-            'timeout' => $this->timeout,
-        ]);
-
-        $status = null;
-        $stdout = $stderr = '';
+        $temporaryOutput = null;
         try {
-            [$status, $stdout, $stderr] = $this->executeCommand($commandArray);
-            $this->checkProcessStatus($status, $stdout, $stderr, $command);
-            $this->checkOutput($output, $command);
-        } catch (\Exception $e) {
-            $this->logger->error(\sprintf('An error happened while generating "%s".', $output), [
+            if ($overwrite && $this->fileExists($output)) {
+                $temporaryOutput = $this->createOutputTemporaryFile($output);
+            }
+            $renderOutput = $temporaryOutput ?? $output;
+
+            $options = $this->mergeOptions($options);
+            $commandArray = $this->buildCommandArray($this->binary, $input, $renderOutput, $options);
+            // String form is kept for logging and exception messages only; the
+            // process is executed from the argument array, never through a shell.
+            $command = $this->buildCommand($this->binary, $input, $renderOutput, $options);
+
+            $this->logger->info(\sprintf('Generate from file(s) "%s" to file "%s".', $input, $output), [
                 'command' => $command,
-                'status' => $status,
+                'env' => $this->env,
+                'timeout' => $this->timeout,
+            ]);
+
+            $status = null;
+            $stdout = $stderr = '';
+            try {
+                [$status, $stdout, $stderr] = $this->executeCommand($commandArray);
+                $this->checkProcessStatus($status, $stdout, $stderr, $command);
+                $this->checkOutput($renderOutput, $command);
+                if (null !== $temporaryOutput && !@\rename($temporaryOutput, $output)) {
+                    throw new \RuntimeException(\sprintf("Could not replace the output file '%s'.", $output));
+                }
+            } catch (\Exception $e) {
+                $this->logger->error(\sprintf('An error happened while generating "%s".', $output), [
+                    'command' => $command,
+                    'status' => $status,
+                    'stdout' => $stdout,
+                    'stderr' => $stderr,
+                ]);
+
+                throw $e;
+            }
+
+            $this->logger->info(\sprintf('File "%s" has been successfully generated.', $output), [
+                'command' => $command,
                 'stdout' => $stdout,
                 'stderr' => $stderr,
             ]);
-
-            throw $e;
+        } finally {
+            if (null !== $temporaryOutput && $this->fileExists($temporaryOutput)) {
+                $this->unlink($temporaryOutput);
+            }
         }
-
-        $this->logger->info(\sprintf('File "%s" has been successfully generated.', $output), [
-            'command' => $command,
-            'stdout' => $stdout,
-            'stderr' => $stderr,
-        ]);
     }
 
     /**
@@ -319,12 +334,24 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
             if (false === $overwrite) {
                 throw new FileAlreadyExistsException(\sprintf('The output file \'%s\' already exists.', $filename));
             }
-            if (!$this->unlink($filename)) {
-                throw new \RuntimeException(\sprintf('Could not delete the existing output file \'%s\'.', $filename));
-            }
         } elseif (!$this->isDir($directory) && !$this->mkdir($directory)) {
             throw new \RuntimeException(\sprintf('The output file\'s directory \'%s\' could not be created.', $directory));
         }
+    }
+
+    /**
+     * Reserves a sibling file so failed generation cannot damage an existing output.
+     */
+    private function createOutputTemporaryFile(string $output): string
+    {
+        $filename = \dirname($output) . \DIRECTORY_SEPARATOR . 'php_weasyprint_output_' . \bin2hex(\random_bytes(16)) . '.pdf';
+        $handle = @\fopen($filename, 'xb');
+        if (false === $handle) {
+            throw new \RuntimeException(\sprintf("Could not create a temporary output file in '%s'.", \dirname($output)));
+        }
+        \fclose($handle);
+
+        return $filename;
     }
 
     /**
