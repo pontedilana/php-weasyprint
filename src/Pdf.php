@@ -76,9 +76,8 @@ class Pdf extends AbstractGenerator
     protected function handleOptions(array $options = []): array
     {
         foreach ($options as $option => $value) {
-            if (null === $value) {
-                unset($options[$option]);
-
+            if (null === $value || false === $value) {
+                // Preserve explicit overrides when the parent merges instance options.
                 continue;
             }
 

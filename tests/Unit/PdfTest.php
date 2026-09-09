@@ -121,6 +121,40 @@ class PdfTest extends TestCase
         $this->assertSame(\file_get_contents(__DIR__ . '/../Fixture/attachment-two.txt'), \file_get_contents($attachments[1]));
     }
 
+    #[DataProvider('disabledOptionValues')]
+    public function testPerCallOptionsCanDisableInstanceOptions(bool|array|null $disabled): void
+    {
+        $pdf = new PdfSpy();
+        $pdf->setOptions([
+            'timeout' => 30,
+            'stylesheet' => 'h1 { color: navy; }',
+            'attachment' => 'Attachment content',
+            'presentational-hints' => true,
+        ]);
+        $instanceOptions = $pdf->getOptions();
+        $pdf->getOutputFromHtml('<h1>Test</h1>', [
+            'timeout' => $disabled,
+            'stylesheet' => $disabled,
+            'attachment' => $disabled,
+            'presentational-hints' => $disabled,
+        ]);
+
+        foreach (['timeout', 'stylesheet', 'attachment', 'presentational-hints'] as $option) {
+            $this->assertStringNotContainsString('--' . $option, $pdf->getLastCommand());
+        }
+        $this->assertSame($instanceOptions, $pdf->getOptions());
+
+        $pdf->getOutputFromHtml('<h1>Next call</h1>');
+        foreach (['timeout', 'stylesheet', 'attachment', 'presentational-hints'] as $option) {
+            $this->assertStringContainsString('--' . $option, $pdf->getLastCommand());
+        }
+    }
+
+    public static function disabledOptionValues(): array
+    {
+        return ['null' => [null], 'false' => [false], 'empty array' => [[]]];
+    }
+
     public static function dataOptions(): array
     {
         $q = self::SHELL_ARG_QUOTE_REGEX;
