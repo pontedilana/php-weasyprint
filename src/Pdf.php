@@ -109,7 +109,7 @@ class Pdf extends AbstractGenerator
             $saveToTempFile = !$this->isFile($item) && !$this->isOptionUrl($item);
             $fetchUrlContent = 'attachment' === $option && $this->isOptionUrl($item);
             if ($saveToTempFile || $fetchUrlContent) {
-                $fileContent = $fetchUrlContent ? \file_get_contents($item) : $item;
+                $fileContent = $fetchUrlContent ? $this->getFileContents($item) : $item;
                 $returnOptions[] = $this->createTemporaryFile(
                     $fileContent,
                     $this->optionsWithContentCheck[$option] ?? 'temp'

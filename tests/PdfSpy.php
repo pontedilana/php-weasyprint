@@ -41,6 +41,16 @@ class PdfSpy extends Pdf
         return [0, 'output', 'errorOutput'];
     }
 
+    protected function getFileContents(string $filename): string
+    {
+        $fixtures = [
+            'https://example.test/attachment-one.txt' => __DIR__ . '/Fixture/attachment-one.txt',
+            'https://example.test/attachment-two.txt' => __DIR__ . '/Fixture/attachment-two.txt',
+        ];
+
+        return parent::getFileContents($fixtures[$filename] ?? $filename);
+    }
+
     protected function checkOutput(string $output, string $command): void
     {
         // let's say everything went right

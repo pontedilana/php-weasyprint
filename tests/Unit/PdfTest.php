@@ -112,6 +112,23 @@ class PdfTest extends TestCase
         $this->assertMatchesRegularExpression($expectedRegex, $testObject->getLastCommand());
     }
 
+    public function testAttachmentUrlsPreserveDownloadedContents(): void
+    {
+        $pdf = new PdfSpy();
+        $pdf->getOutputFromHtml('<html></html>', ['attachment' => [
+            'https://example.test/attachment-one.txt',
+            'https://example.test/attachment-two.txt',
+        ]]);
+
+        $attachments = \array_values(\array_filter(
+            $pdf->temporaryFiles,
+            static fn(string $path): bool => 'temp' === \pathinfo($path, \PATHINFO_EXTENSION)
+        ));
+        $this->assertCount(2, $attachments);
+        $this->assertSame(\file_get_contents(__DIR__ . '/../Fixture/attachment-one.txt'), \file_get_contents($attachments[0]));
+        $this->assertSame(\file_get_contents(__DIR__ . '/../Fixture/attachment-two.txt'), \file_get_contents($attachments[1]));
+    }
+
     public function dataOptions(): array
     {
         $q = self::SHELL_ARG_QUOTE_REGEX;
@@ -150,12 +167,12 @@ class PdfTest extends TestCase
             ],
 
             '6 - save the content of the given attachment URL to a file and pass that filename' => [
-                ['attachment' => 'https://www.google.com/favicon.ico'],
+                ['attachment' => 'https://example.test/attachment-one.txt'],
                 '/' . $q . 'emptyBinary' . $q . ' --attachment ' . $q . '.*php_weasyprint.*\.temp' . $q . ' --timeout \d* ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
 
             '7 - save the content of multiple attachment URLs to files and pass those filenames' => [
-                ['attachment' => ['https://www.google.com/favicon.ico', 'https://github.githubassets.com/favicons/favicon.svg']],
+                ['attachment' => ['https://example.test/attachment-one.txt', 'https://example.test/attachment-two.txt']],
                 '/' . $q . 'emptyBinary' . $q . ' --attachment ' . $q . '.*php_weasyprint.*\.temp' . $q . ' --attachment ' . $q . '.*php_weasyprint.*\.temp' . $q . ' --timeout \d* ' . $q . '.*\.html' . $q . ' ' . $q . '.*\.pdf' . $q . '/',
             ],
 
