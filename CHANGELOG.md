@@ -6,10 +6,8 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 
 ## Unreleased
 ### Added
-- Validate option values constrained by WeasyPrint to a fixed set (e.g. `pdf-variant`) against an allow-list (`WeasyPrintOptionValues`); invalid values are rejected by `setOption()` as defense-in-depth
 - Backed enums `Enum\PdfVariant`, `Enum\MediaType` and `Enum\PdfVersion` for the most common option values; `setOption()`/`setOptions()` and per-call options now accept a `BackedEnum` and convert it to its scalar value. `WeasyPrintOptionValues` derives its allow-list from `PdfVariant` (`PdfVersion` is a convenience only — WeasyPrint does not constrain `pdf-version`)
 - New `buildCommandArray()` and `checkBinary()` protected methods on `AbstractGenerator`
-- Support WeasyPrint 69.0 new `--output-intent` option
 
 ### Removed
 - **[BC break]** Drop support for PHP 7.4, 8.0, 8.1 and 8.2; the minimum required version is now PHP 8.3
@@ -17,10 +15,21 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 - **[BC break]** Remove the deprecated WeasyPrint options `format` and `resolution`, which are no longer supported by WeasyPrint 60+ (PNG output and these options were removed upstream). Setting them now throws an `InvalidArgumentException`
 
 ### Changed
+- **[BC break]** Validate `pdf-variant` values against `WeasyPrintOptionValues`; unsupported values now throw `InvalidArgumentException` when supplied to the constructor, `setOption()`, `setOptions()` or per-call options, before WeasyPrint is executed.
 - Retain the deprecated `optimize-size` option for compatibility with WeasyPrint 60; it was deprecated in WeasyPrint 59 and removed in WeasyPrint 61
 - **[BC break]** The WeasyPrint process is now executed from an argument array (`new Process([...])`) instead of a shell command string (`Process::fromShellCommandline()`). Execution no longer goes through a shell, removing shell-command injection as a class of vulnerability. The escaped string form (`getCommand()` / `buildCommand()`) is retained for logging and exception messages only.
+- **[BC break]** Overrides of `getCommand()` or `buildCommand()` no longer customize the executed command; subclasses must override `buildCommandArray()` to change execution arguments. `generate()` no longer calls `getCommand()`.
 - **[BC break]** `executeCommand()` signature changed from `executeCommand(string $command)` to `executeCommand(array $command)`. Subclasses overriding it must be updated.
 - **[BC break]** The binary executability check moved out of `getEscapedBinary()` into the new `checkBinary()` method. Subclasses overriding `getEscapedBinary()` to bypass the check (e.g. test doubles) must override `checkBinary()` instead.
+- Upgrade development tooling to PHPUnit 12.5; this does not add a PHPUnit dependency to applications installing the library.
+
+### Fixed
+- Reject every non-zero process exit code with `RuntimeException`, including failures with empty stderr; a non-empty partial output file is no longer returned as a successful result.
+- Throw `CouldNotReadFileContentException` when an attachment URL cannot be read, instead of continuing with an empty attachment when PHP warnings are not converted to exceptions.
+
+## 2.7.0 - 2026-06-03
+### Added
+- Support WeasyPrint 69.0 new `--output-intent` option
 
 ## 2.6.0 - 2026-05-25
 ### Security

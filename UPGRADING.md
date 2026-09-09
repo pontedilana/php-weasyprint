@@ -12,9 +12,21 @@ and how to adapt your code.
 
 If you run on an older PHP or Symfony version, stay on the `2.x` branch until you can upgrade.
 
+### Option value validation
+
+`pdf-variant` is now validated against the values returned by
+`WeasyPrintOptionValues::getAllowedValues('pdf-variant')`. Unsupported values throw
+`InvalidArgumentException` in the constructor, `setOption()`, `setOptions()` and
+per-call options, before WeasyPrint is executed. Arrays are checked element by element.
+
+Use a supported value or a `PdfVariant` enum case. If your application previously
+handled these failures only as process errors, update it to handle
+`InvalidArgumentException` during option configuration as well. Free-form options
+such as `media-type` and `pdf-version` are not restricted to enum cases.
+
 ### Backed enums for option values (optional)
 
-`Enum\PdfVariant` and `Enum\MediaType` are now available and accepted by `setOption()`,
+`Enum\PdfVariant`, `Enum\MediaType` and `Enum\PdfVersion` are now available and accepted by `setOption()`,
 `setOptions()` and per-call options. This is **additive** — plain strings keep working —
 but it is the recommended way to set those options:
 
@@ -46,10 +58,11 @@ longer goes through a shell, which removes shell-command injection as a class of
 vulnerability.
 
 **If you only use the public API** (`generate()`, `generateFromHtml()`, `getOutput()`,
-`getOutputFromHtml()`), nothing changes — the Snappy-compatible `GeneratorInterface` is
-unchanged.
+`getOutputFromHtml()`), the method signatures in `GeneratorInterface` are unchanged.
+Option validation, removed options and error handling still change as described in
+this guide.
 
-**If you extend `AbstractGenerator` or `Pdf`**, the following protected methods changed:
+**If you extend `AbstractGenerator` or `Pdf`**, the execution hooks changed as follows:
 
 #### `executeCommand()` now receives an array
 
@@ -70,11 +83,39 @@ protected function executeCommand(array $command): array
 }
 ```
 
-If you override it to run the process yourself, build the process from the array:
+If you override it to add behavior around execution, delegate to the parent to
+preserve the configured environment and timeout:
 
 ```php
-$process = new \Symfony\Component\Process\Process($command, null, $this->env, null, $this->timeout);
+protected function executeCommand(array $command): array
+{
+    // Add custom behavior here.
+    return parent::executeCommand($command);
+}
 ```
+
+If you execute the process yourself, pass the argument array to `new Process()`
+and supply your own environment and timeout. The parent's `$env` and `$timeout`
+properties are private.
+
+#### Command customization moves to `buildCommandArray()`
+
+Overrides of `getCommand()` or `buildCommand()` no longer alter the arguments passed
+to WeasyPrint. `generate()` no longer calls `getCommand()`; it calls
+`buildCommandArray()` for execution and `buildCommand()` for the log representation.
+
+Move any execution customization to the new protected method:
+
+```php
+protected function buildCommandArray(string $binary, string $input, string $output, array $options = []): array
+{
+    // Apply custom options or adjust the input/output paths here.
+    return parent::buildCommandArray($binary, $input, $output, $options);
+}
+```
+
+Do not shell-escape the array elements. If you change the execution arguments,
+keep any custom log representation consistent with them.
 
 #### Binary check moved to `checkBinary()`
 
@@ -103,5 +144,29 @@ protected function checkBinary(string $binary): void
 
 `getCommand()` and `buildCommand()` still return the command as a shell-escaped
 string, but that string is now used **only** for logging and exception messages — it is
-no longer what gets executed. If you relied on these methods for display or logging,
-their output is unchanged.
+no longer what gets executed. Existing display and logging calls remain available;
+execution customizations must use `buildCommandArray()` as described above.
+
+### Error handling corrections
+
+Every non-zero process exit code now throws `RuntimeException`, even when stderr is
+empty. Previously, a failed process could be treated as successful if it left a
+non-empty output file. Callers must handle the exception instead of consuming a
+partial result.
+
+If an attachment URL cannot be read, the library now throws
+`Pontedilana\PhpWeasyPrint\Exception\CouldNotReadFileContentException` (a
+`RuntimeException`). Previously, if the application did not convert PHP warnings
+into exceptions, the failed read could produce an empty attachment. Handle this
+exception or correct the attachment URL before retrying. PHP stream warnings may
+still be emitted by the failed read.
+
+### Development tooling
+
+The repository's unit and integration suites now use PHPUnit 12.5, with PHP
+attributes for metadata and static data providers. This only affects contributors
+and projects reusing these tests: Composer does not install this library's
+`require-dev` dependencies in consuming applications.
+
+Run `composer unit-tests` for unit tests and set `WEASYPRINT_BINARY` when running
+`composer integration-tests`. Both suites fail on warnings, deprecations and notices.
