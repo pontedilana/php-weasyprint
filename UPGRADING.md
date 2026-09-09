@@ -159,6 +159,32 @@ deleting it. Subclasses overriding this method must also preserve existing files
 During replacement, command hooks and logs refer to the temporary output path;
 `generate()` still publishes the result at the requested destination.
 
+### Temporary file ownership and lifetime
+
+The public `$temporaryFiles` property is now private. Replace read access with
+`$pdf->getTemporaryFiles()`, which returns a snapshot of the registered paths.
+Changing that array does not register files for deletion. The generator only
+cleans up temporary files it created; caller-supplied input, output, stylesheet
+and attachment files are not registered for cleanup.
+
+Temporary HTML, output and option files are now removed before a generation call
+returns or throws. Subclasses inspecting these files after calling a parent
+generation method must move that work inside the generation hooks, while the files
+still exist. Files created before the call are preserved for the enclosing call
+or explicit cleanup.
+
+`removeTemporaryFiles()` remains available and can be called repeatedly. It tracks
+files across changes to `setTemporaryFolder()` and retains failed deletions for a
+later cleanup attempt. Destruction and shutdown still provide fallback cleanup,
+without keeping otherwise unused generator instances alive until shutdown.
+
+The protected `createTemporaryFile(null, ...)` method now creates and reserves an
+empty file. Subclasses using it for an output path must pass `overwrite: true` to
+`generate()`, as `getOutput()` now does internally. Temporary names are random and
+created exclusively; creation failures and incomplete writes throw
+`RuntimeException`. Extensions containing path separators or null bytes throw
+`InvalidArgumentException`.
+
 ### Error handling corrections
 
 Every non-zero process exit code now throws `RuntimeException`, even when stderr is

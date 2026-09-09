@@ -8,6 +8,9 @@ class PdfSpy extends Pdf
 {
     private string $lastCommand;
 
+    /** @var list<string> */
+    private array $attachmentContents = [];
+
     public function __construct()
     {
         parent::__construct('emptyBinary');
@@ -18,12 +21,12 @@ class PdfSpy extends Pdf
         return $this->lastCommand;
     }
 
-    public function getOutput($input, array $options = []): string
+    /**
+     * @return list<string>
+     */
+    public function getAttachmentContents(): array
     {
-        $filename = $this->createTemporaryFile(null, $this->getDefaultExtension());
-        $this->generate($input, $filename, $options, true);
-
-        return 'output';
+        return $this->attachmentContents;
     }
 
     protected function checkBinary(string $binary): void
@@ -37,6 +40,13 @@ class PdfSpy extends Pdf
     protected function executeCommand(array $command): array
     {
         $this->lastCommand = \implode(' ', $command);
+        $this->attachmentContents = [];
+        foreach ($command as $index => $argument) {
+            if ('--attachment' === $argument) {
+                $this->attachmentContents[] = $this->getFileContents($command[$index + 1]);
+            }
+        }
+        \file_put_contents($command[\count($command) - 1], 'output');
 
         return [0, 'output', 'errorOutput'];
     }

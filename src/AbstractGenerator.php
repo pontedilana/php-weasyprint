@@ -26,8 +26,11 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
 
     protected const WINDOWS_LOCAL_FILENAME_REGEX = '/^[a-z]:(?:[\\\\\/]?(?:[\w\s!#()-]+|[\.]{1,2})+)*[\\\\\/]?/i';
 
-    /** @var list<string> */
-    public array $temporaryFiles = [];
+    /** @var array<string, string> File paths mapped to their original directory. */
+    private array $temporaryFiles = [];
+
+    /** @var \WeakMap<self, true> */
+    private static \WeakMap $instances;
     protected ?string $temporaryFolder = null;
     private LoggerInterface $logger;
     private string $defaultExtension;
@@ -69,9 +72,15 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
         $this->setOptions($options);
         $this->env = empty($env) ? null : $env;
 
-        if (\is_callable([$this, 'removeTemporaryFiles'])) {
-            \register_shutdown_function([$this, 'removeTemporaryFiles']);
+        if (!isset(self::$instances)) {
+            self::$instances = new \WeakMap();
+            \register_shutdown_function(static function(): void {
+                foreach (self::$instances as $generator => $registered) {
+                    $generator->removeTemporaryFiles();
+                }
+            });
         }
+        self::$instances[$this] = true;
     }
 
     public function __destruct()
@@ -99,7 +108,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
 
         $temporaryOutput = null;
         try {
-            if ($overwrite && $this->fileExists($output)) {
+            if ($overwrite && $this->fileExists($output) && !isset($this->temporaryFiles[$output])) {
                 $temporaryOutput = $this->createOutputTemporaryFile($output);
             }
             $renderOutput = $temporaryOutput ?? $output;
@@ -153,9 +162,14 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     public function generateFromHtml(string $html, string $output, array $options = [], bool $overwrite = false): void
     {
-        $fileName = $this->createTemporaryFile($html, 'html');
+        $existingFiles = $this->getTemporaryFiles();
+        try {
+            $fileName = $this->createTemporaryFile($html, 'html');
 
-        $this->generate($fileName, $output, $options, $overwrite);
+            $this->generate($fileName, $output, $options, $overwrite);
+        } finally {
+            $this->removeTemporaryFilesAfter($existingFiles);
+        }
     }
 
     /**
@@ -163,11 +177,16 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     public function getOutput(string $input, array $options = []): string
     {
-        $filename = $this->createTemporaryFile(null, $this->getDefaultExtension());
+        $existingFiles = $this->getTemporaryFiles();
+        try {
+            $filename = $this->createTemporaryFile(null, $this->getDefaultExtension());
 
-        $this->generate($input, $filename, $options);
+            $this->generate($input, $filename, $options, true);
 
-        return $this->getFileContents($filename);
+            return $this->getFileContents($filename);
+        } finally {
+            $this->removeTemporaryFilesAfter($existingFiles);
+        }
     }
 
     /**
@@ -175,9 +194,14 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     public function getOutputFromHtml(string $html, array $options = []): string
     {
-        $fileName = $this->createTemporaryFile($html, 'html');
+        $existingFiles = $this->getTemporaryFiles();
+        try {
+            $fileName = $this->createTemporaryFile($html, 'html');
 
-        return $this->getOutput($fileName, $options);
+            return $this->getOutput($fileName, $options);
+        } finally {
+            $this->removeTemporaryFilesAfter($existingFiles);
+        }
     }
 
     public function setLogger(LoggerInterface $logger): void
@@ -445,25 +469,39 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     }
 
     /**
-     * Removes all temporary files.
+     * Returns a snapshot of the files currently owned by this generator.
+     *
+     * @return list<string>
+     */
+    public function getTemporaryFiles(): array
+    {
+        return \array_keys($this->temporaryFiles);
+    }
+
+    /**
+     * Removes owned temporary files. Failed deletions remain registered for retry.
      */
     public function removeTemporaryFiles(): void
     {
-        $temporaryFolderPath = \realpath($this->getTemporaryFolder());
-        if (false === $temporaryFolderPath) {
-            return;
-        }
-        $temporaryFolderPath = \rtrim($temporaryFolderPath, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR;
+        $this->removeTemporaryFilesAfter([]);
+    }
 
-        foreach ($this->temporaryFiles as $file) {
-            // Only delete files actually located inside the temporary folder, so a path
-            // injected into the public $temporaryFiles cannot turn cleanup into an
-            // arbitrary file deletion at shutdown.
-            $filePath = \realpath($file);
-            if (false === $filePath || 0 !== \strncmp($filePath, $temporaryFolderPath, \strlen($temporaryFolderPath))) {
+    /**
+     * Cleans up files created since the supplied snapshot, preserving outer calls.
+     *
+     * @param list<string> $existingFiles
+     */
+    protected function removeTemporaryFilesAfter(array $existingFiles): void
+    {
+        foreach (\array_diff(\array_keys($this->temporaryFiles), $existingFiles) as $file) {
+            // Do not follow a parent directory that has been replaced by a symlink.
+            \clearstatcache(true);
+            if (\realpath(\dirname($file)) !== $this->temporaryFiles[$file]) {
                 continue;
             }
-            $this->unlink($file);
+            if ((!$this->fileExists($file) && !\is_link($file)) || @$this->unlink($file)) {
+                unset($this->temporaryFiles[$file]);
+            }
         }
     }
 
@@ -486,37 +524,47 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
     }
 
     /**
-     * Creates a temporary file.
-     * The file is not created if the $content argument is null.
-     *
-     * @param string|null $content   Optional content for the temporary file
-     * @param string|null $extension An optional extension for the filename
-     *
-     * @return string The filename
+     * Reserves a temporary file and optionally writes content to it.
+     * Null content creates an empty file reserved for generated output.
      */
     protected function createTemporaryFile(?string $content = null, ?string $extension = null): string
     {
-        $dir = \rtrim($this->getTemporaryFolder(), \DIRECTORY_SEPARATOR);
-
+        if (null !== $extension && (\str_contains($extension, '/') || \str_contains($extension, '\\') || \str_contains($extension, "\0"))) {
+            throw new \InvalidArgumentException('The temporary file extension must not contain path separators or null bytes.');
+        }
+        $dir = $this->getTemporaryFolder();
         if (!\is_dir($dir)) {
             if (false === @\mkdir($dir, 0777, true) && !\is_dir($dir)) {
                 throw new \RuntimeException(\sprintf("Unable to create directory: %s\n", $dir));
             }
-        } elseif (!\is_writable($dir)) {
+        }
+        $directory = \realpath($dir);
+        if (false === $directory || !\is_writable($directory)) {
             throw new \RuntimeException(\sprintf("Unable to write in directory: %s\n", $dir));
         }
 
-        $filename = $dir . \DIRECTORY_SEPARATOR . \uniqid('php_weasyprint', true);
-
-        if (null !== $extension) {
+        $filename = \rtrim($directory, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR . 'php_weasyprint' . \bin2hex(\random_bytes(16));
+        if (null !== $extension && '' !== $extension) {
             $filename .= '.' . $extension;
         }
-
-        if (null !== $content) {
-            \file_put_contents($filename, $content);
+        $handle = @\fopen($filename, 'xb');
+        if (false === $handle) {
+            throw new \RuntimeException(\sprintf("Unable to create temporary file: %s\n", $filename));
         }
-
-        $this->temporaryFiles[] = $filename;
+        $existingFiles = $this->getTemporaryFiles();
+        $this->temporaryFiles[$filename] = $directory;
+        try {
+            try {
+                if (null !== $content && \strlen($content) !== @\fwrite($handle, $content)) {
+                    throw new \RuntimeException(\sprintf("Unable to write temporary file: %s\n", $filename));
+                }
+            } finally {
+                \fclose($handle);
+            }
+        } catch (\Throwable $exception) {
+            $this->removeTemporaryFilesAfter($existingFiles);
+            throw $exception;
+        }
 
         return $filename;
     }
@@ -689,6 +737,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     protected function checkOutput(string $output, string $command): void
     {
+        \clearstatcache(true, $output);
         // the output file must exist
         if (!$this->fileExists($output)) {
             throw new \RuntimeException(\sprintf('The file \'%s\' was not created (command: %s).', $output, $command));
@@ -770,7 +819,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
      */
     protected function unlink(string $filename): bool
     {
-        return $this->fileExists($filename) && \unlink($filename);
+        return ($this->fileExists($filename) || \is_link($filename)) && \unlink($filename);
     }
 
     /**

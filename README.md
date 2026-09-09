@@ -129,6 +129,18 @@ $pdf->setOption('media-type', 'screen');
 $pdf->resetOptions();
 ```
 
+### Temporary files
+
+Temporary HTML, generated output and inline or downloaded option files are cleaned
+up when each generation call finishes, including on failure. Files supplied by
+the caller and the requested destination of `generate()` or `generateFromHtml()`
+remain available.
+
+Use `setTemporaryFolder('/path/to/temp')` to choose the temporary directory.
+`getTemporaryFiles()` returns a snapshot of the remaining registered paths, and
+`removeTemporaryFiles()` retries cleanup if a file could not be deleted earlier.
+Destruction and shutdown also attempt cleanup.
+
 ### Timeouts
 
 A default timeout of 10 seconds is set for the WeasyPrint process to prevent orphaned or hanging processes.  
@@ -201,4 +213,3 @@ If your reproducer is big, please try to shrink it. It will help everyone to nar
 
 PhpWeasyPrint has been originally developed by the [Pontedilana](https://www.pontedilana.it) dev team.  
 Snappy has been originally developed by the [KnpLabs](https://knplabs.com) team.
-

@@ -47,9 +47,14 @@ class Pdf extends AbstractGenerator
      */
     public function generate(string $input, string $output, array $options = [], bool $overwrite = false): void
     {
-        $options = $this->handleOptions($this->mergeOptions($options));
+        $existingFiles = $this->getTemporaryFiles();
+        try {
+            $options = $this->handleOptions($this->mergeOptions($options));
 
-        parent::generate($input, $output, $options, $overwrite);
+            parent::generate($input, $output, $options, $overwrite);
+        } finally {
+            $this->removeTemporaryFilesAfter($existingFiles);
+        }
     }
 
     public function setTimeout(?int $timeout): self

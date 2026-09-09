@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 - **[BC break]** Remove the deprecated WeasyPrint options `format` and `resolution`, which are no longer supported by WeasyPrint 60+ (PNG output and these options were removed upstream). Setting them now throws an `InvalidArgumentException`
 
 ### Changed
+- **[BC break]** Make `temporaryFiles` private; use `getTemporaryFiles()` to inspect a snapshot of the generator's temporary file paths.
+- **[BC break]** Remove temporary HTML, output and option files when each generation call finishes, including on failure. The protected `createTemporaryFile(null, ...)` method now reserves an empty file instead of returning an unused path.
 - **[BC break]** Validate `pdf-variant` values against `WeasyPrintOptionValues`; unsupported values now throw `InvalidArgumentException` when supplied to the constructor, `setOption()`, `setOptions()` or per-call options, before WeasyPrint is executed.
 - Retain the deprecated `optimize-size` option for compatibility with WeasyPrint 60; it was deprecated in WeasyPrint 59 and removed in WeasyPrint 61
 - **[BC break]** The WeasyPrint process is now executed from an argument array (`new Process([...])`) instead of a shell command string (`Process::fromShellCommandline()`). Execution no longer goes through a shell, removing shell-command injection as a class of vulnerability. The escaped string form (`getCommand()` / `buildCommand()`) is retained for logging and exception messages only.
@@ -24,6 +26,8 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 - Upgrade development tooling to PHPUnit 12.5; this does not add a PHPUnit dependency to applications installing the library.
 
 ### Fixed
+- Release generator instances and their temporary files in long-running workers; cleanup tracks each file's original directory even after `setTemporaryFolder()` changes, and retries failed deletions.
+- Reserve temporary files exclusively with random names and reject incomplete content writes.
 - Preserve existing output files when overwriting fails; generate to a sibling temporary file and replace the destination only after process and output checks succeed.
 - Preserve per-call `null`, `false` and empty-array option overrides without restoring instance defaults or creating empty attachments and stylesheets.
 - Reject every non-zero process exit code with `RuntimeException`, including failures with empty stderr; a non-empty partial output file is no longer returned as a successful result.

@@ -83,18 +83,6 @@ class PdfTest extends TestCase
         $this->assertDirectoryExists($temporaryFolder);
     }
 
-    public function testRemovesLocalFilesOnError(): void
-    {
-        $pdf = new PdfSpy();
-        $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
-        $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
-        $this->assertCount(1, $pdf->temporaryFiles);
-        $this->expectException(\RuntimeException::class);
-        throw new \RuntimeException('Throw exception to cleanup files');
-        /** @phpstan-ignore-next-line */
-        $this->assertFileDoesNotExist(\reset($pdf->temporaryFiles));
-    }
-
     #[DataProvider('dataOptions')]
     public function testOptions(array $options, string $expectedRegex): void
     {
@@ -112,13 +100,10 @@ class PdfTest extends TestCase
             'https://example.test/attachment-two.txt',
         ]]);
 
-        $attachments = \array_values(\array_filter(
-            $pdf->temporaryFiles,
-            static fn(string $path): bool => 'temp' === \pathinfo($path, \PATHINFO_EXTENSION)
-        ));
-        $this->assertCount(2, $attachments);
-        $this->assertSame(\file_get_contents(__DIR__ . '/../Fixture/attachment-one.txt'), \file_get_contents($attachments[0]));
-        $this->assertSame(\file_get_contents(__DIR__ . '/../Fixture/attachment-two.txt'), \file_get_contents($attachments[1]));
+        $this->assertSame([
+            \file_get_contents(__DIR__ . '/../Fixture/attachment-one.txt'),
+            \file_get_contents(__DIR__ . '/../Fixture/attachment-two.txt'),
+        ], $pdf->getAttachmentContents());
     }
 
     #[DataProvider('disabledOptionValues')]
@@ -250,9 +235,8 @@ class PdfTest extends TestCase
         $pdf = new PdfSpy();
         $method = new \ReflectionMethod($pdf, 'createTemporaryFile');
         $method->invoke($pdf, 'test', $pdf->getDefaultExtension());
-        $this->assertCount(1, $pdf->temporaryFiles);
-        $file = \reset($pdf->temporaryFiles);
-        $this->assertIsNotBool($file);
+        $this->assertCount(1, $pdf->getTemporaryFiles());
+        $file = $pdf->getTemporaryFiles()[0];
         $this->assertFileExists($file);
         $pdf->__destruct();
         $this->assertFileDoesNotExist($file);
