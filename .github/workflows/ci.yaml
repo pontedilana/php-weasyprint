@@ -83,3 +83,45 @@ jobs:
 
       - name: Test with PHPUnit
         run: ./vendor/bin/phpunit
+
+  integration:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        weasyprint-version: ["60.0", "69.0", "70.0"]
+    name: Integration - WeasyPrint ${{ matrix.weasyprint-version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install native dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 fonts-dejavu-core
+
+      - name: Install WeasyPrint
+        env:
+          WEASYPRINT_VERSION: ${{ matrix.weasyprint-version }}
+        run: |
+          if [ "$WEASYPRINT_VERSION" = "60.0" ]; then
+            # WeasyPrint 60 uses the older pydyf API.
+            python -m pip install "weasyprint==$WEASYPRINT_VERSION" "pydyf==0.8.0"
+          else
+            python -m pip install "weasyprint==$WEASYPRINT_VERSION"
+          fi
+          echo "WEASYPRINT_BINARY=$(command -v weasyprint)" >> "$GITHUB_ENV"
+
+      - name: Install PHP dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Test with WeasyPrint
+        run: composer integration-tests

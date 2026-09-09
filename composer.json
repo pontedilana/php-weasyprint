@@ -45,6 +45,7 @@
         "check-cs": "vendor/bin/php-cs-fixer fix --diff --dry-run --verbose",
         "fix-cs": "vendor/bin/php-cs-fixer fix --verbose",
         "static-analysis": "vendor/bin/phpstan analyse --ansi",
-        "unit-tests": "vendor/bin/phpunit"
+        "unit-tests": "vendor/bin/phpunit",
+        "integration-tests": "vendor/bin/phpunit --configuration phpunit.integration.xml.dist"
     }
 }

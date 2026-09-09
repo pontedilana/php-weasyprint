@@ -170,6 +170,21 @@ Although PhpWeasyPrint and Snappy are interchangeable, there are a couple of dif
 * WeasyPrint doesn't support multiple sources to be merged in one single output pdf, so only one input source (string or URL) is accepted in PhpWeasyPrint;
 * WeasyPrint version >= 53 doesn't generate images, so image generation from HTML string or URL is possible only with WeasyPrint lower versions and an unsupported PhpWeasyPrint version (`Pontedilana\PhpWeasyPrint\Image` has been successfully tested with Weasyprint 52.5 on PhpWeasyPrint 0.13.0).
 
+## Running tests
+
+Run `composer unit-tests` for the unit suite, which does not require network access
+or an installed WeasyPrint binary. Run `composer check-cs` and
+`composer static-analysis` for coding standards and static analysis.
+
+The integration suite requires a real WeasyPrint installation:
+
+```bash
+WEASYPRINT_BINARY=/usr/local/bin/weasyprint composer integration-tests
+```
+
+CI runs this suite with WeasyPrint 60.0, 69.0 and 70.0. The WeasyPrint 60.0
+installation pins `pydyf` to 0.8.0 for compatibility with its older PDF API.
+
 ## Bugs & Support
 
 If you found a bug please fill a [detailed issue](https://github.com/pontedilana/php-weasyprint/issues) with all the following points.
