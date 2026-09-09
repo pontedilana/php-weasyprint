@@ -230,6 +230,22 @@ class PdfTest extends TestCase
         $this->assertMatchesRegularExpression($expectedRegex, $testObject2->getLastCommand());
     }
 
+    public function testResetOptionsRestoresBothTimeouts(): void
+    {
+        $pdf = new PdfSpy();
+        $pdf->setTimeout(30);
+        $pdf->setOption('media-type', 'screen');
+        $pdf->resetOptions();
+
+        $this->assertSame(\Pontedilana\PhpWeasyPrint\AbstractGenerator::DEFAULT_TIMEOUT, $pdf->getOptions()['timeout']);
+        $this->assertNull($pdf->getOptions()['media-type']);
+        $timeout = new \ReflectionProperty(\Pontedilana\PhpWeasyPrint\AbstractGenerator::class, 'timeout');
+        $this->assertSame(\Pontedilana\PhpWeasyPrint\AbstractGenerator::DEFAULT_TIMEOUT, $timeout->getValue($pdf));
+
+        $pdf->getOutputFromHtml('<html></html>');
+        $this->assertMatchesRegularExpression('/--timeout 10/', $pdf->getLastCommand());
+    }
+
     public function testRemovesLocalFilesOnDestruct(): void
     {
         $pdf = new PdfSpy();

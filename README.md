@@ -129,6 +129,9 @@ $pdf->setOption('media-type', 'screen');
 $pdf->resetOptions();
 ```
 
+For `Pdf`, this also restores the default 10-second timeout for both Symfony Process
+and the WeasyPrint `--timeout` option.
+
 ### Temporary files
 
 Temporary HTML, generated output and inline or downloaded option files are cleaned

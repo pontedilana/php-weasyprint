@@ -73,6 +73,12 @@ class Pdf extends AbstractGenerator
         return $this;
     }
 
+    public function resetOptions(): void
+    {
+        parent::resetOptions();
+        $this->setTimeout(self::DEFAULT_TIMEOUT);
+    }
+
     /**
      * @param array<string, bool|int|string|array|null> $options
      *

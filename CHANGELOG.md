@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning(https://semver.org/spec/v2.0.0.
 - Upgrade development tooling to PHPUnit 12.5; this does not add a PHPUnit dependency to applications installing the library.
 
 ### Fixed
+- Make `Pdf::resetOptions()` restore the default timeout for both Symfony Process and the WeasyPrint CLI.
 - Release generator instances and their temporary files in long-running workers; cleanup tracks each file's original directory even after `setTemporaryFolder()` changes, and retries failed deletions.
 - Reserve temporary files exclusively with random names and reject incomplete content writes.
 - Preserve existing output files when overwriting fails; generate to a sibling temporary file and replace the destination only after process and output checks succeed.
