@@ -239,6 +239,25 @@ class PdfTest extends TestCase
     }
 
     /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::buildCommandArray
+     */
+    public function testNumericOptionsMatchTheDisplayedCommand(): void
+    {
+        $pdf = new PdfSpy();
+        $pdf->setOptions(['dpi' => '300.0', 'jpeg-quality' => '85.9', 'timeout' => '60.0']);
+        $method = new \ReflectionMethod($pdf, 'buildCommandArray');
+
+        $this->assertSame(
+            ['emptyBinary', '--dpi', '300', '--jpeg-quality', '85', '--timeout', '60', 'input.html', 'output.pdf'],
+            $method->invoke($pdf, 'emptyBinary', 'input.html', 'output.pdf', $pdf->getOptions())
+        );
+        $this->assertSame(
+            "'emptyBinary' --dpi 300 --jpeg-quality 85 --timeout 60 'input.html' 'output.pdf'",
+            $pdf->getCommand('input.html', 'output.pdf')
+        );
+    }
+
+    /**
      * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::setOption
      * @covers \Pontedilana\PhpWeasyPrint\Pdf::validateOptionValue
      * @covers \Pontedilana\PhpWeasyPrint\WeasyPrintOptionValues

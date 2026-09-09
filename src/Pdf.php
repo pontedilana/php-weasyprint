@@ -202,6 +202,33 @@ class Pdf extends AbstractGenerator
     }
 
     /**
+     * @param array<string, bool|int|string|array|null> $options
+     *
+     * @return list<string>
+     */
+    protected function buildCommandArray(string $binary, string $input, string $output, array $options = []): array
+    {
+        return parent::buildCommandArray($binary, $input, $output, $this->normalizeNumericOptions($options));
+    }
+
+    /**
+     * @param array<string, bool|int|string|array|null> $options
+     *
+     * @return array<string, bool|int|string|array|null>
+     */
+    private function normalizeNumericOptions(array $options): array
+    {
+        foreach (['dpi', 'jpeg-quality', 'timeout'] as $name) {
+            $value = $options[$name] ?? null;
+            if (null !== $value && !\is_bool($value) && !\is_array($value)) {
+                $options[$name] = (int)$value;
+            }
+        }
+
+        return $options;
+    }
+
+    /**
      * Builds the command string.
      *
      * @param string                                    $binary  The binary path/name
@@ -213,7 +240,7 @@ class Pdf extends AbstractGenerator
     {
         $command = $this->getEscapedBinary($binary);
 
-        foreach ($options as $key => $option) {
+        foreach ($this->normalizeNumericOptions($options) as $key => $option) {
             if (null === $option || false === $option) {
                 continue;
             }
@@ -232,7 +259,7 @@ class Pdf extends AbstractGenerator
                     case 'dpi':
                     case 'jpeg-quality':
                     case 'timeout':
-                        $command .= ' --' . $key . ' ' . (int)$option;
+                        $command .= ' --' . $key . ' ' . $option;
                         break;
                     default:
                         $command .= ' --' . $key . ' ' . \escapeshellarg((string)$option);
