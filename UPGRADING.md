@@ -26,14 +26,17 @@ $pdf->setOption('pdf-variant', PdfVariant::PdfA3b); // instead of 'pdf/a-3b'
 
 ### Removed WeasyPrint options
 
-The deprecated options `format`, `resolution` and `optimize-size` have been removed: they
+The deprecated options `format` and `resolution` have been removed: they
 are no longer part of the WeasyPrint 60+ CLI (PNG output and these options were dropped
 upstream). Passing any of them to `setOption()` / `setOptions()` or as a per-call option now
 throws an `InvalidArgumentException`.
 
 - `format` / `resolution`: WeasyPrint only produces PDF since version 53; there is no
   replacement. Remove them from your option arrays.
-- `optimize-size`: use `optimize-images` instead.
+
+`optimize-size` remains accepted for compatibility with WeasyPrint 60. It was
+deprecated in WeasyPrint 59 and removed in WeasyPrint 61. For newer versions,
+use `optimize-images` for image optimization.
 
 ### Shell-free command execution
 
