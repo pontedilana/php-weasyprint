@@ -689,7 +689,7 @@ abstract class AbstractGenerator implements GeneratorInterface, LoggerAwareInter
             throw new \RuntimeException(\sprintf('The process exit code is unavailable.' . "\n" . 'stderr: "%s"' . "\n" . 'stdout: "%s"' . "\n" . 'command: %s', $stderr, $stdout, $command));
         }
 
-        if (0 !== $status && '' !== $stderr) {
+        if (0 !== $status) {
             throw new \RuntimeException(\sprintf('The exit status code \'%s\' says something went wrong:' . "\n" . 'stderr: "%s"' . "\n" . 'stdout: "%s"' . "\n" . 'command: %s', $status, $stderr, $stdout, $command), $status);
         }
     }

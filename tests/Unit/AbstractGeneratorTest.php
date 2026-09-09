@@ -758,18 +758,28 @@ class AbstractGeneratorTest extends TestCase
         }
 
         try {
-            $r->invokeArgs($media, [1, '', '', 'the command']);
-            $this->anything();
-        } catch (\RuntimeException $e) {
-            $this->fail('1 status means failure, but no stderr content');
-        }
-
-        try {
             $r->invokeArgs($media, [1, '', 'Could not connect to X', 'the command']);
             $this->fail('1 status means failure');
         } catch (\RuntimeException $e) {
             $this->assertEquals(1, $e->getCode(), 'Exception thrown by checkProcessStatus should pass on the error code');
         }
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\AbstractGenerator::checkProcessStatus
+     */
+    public function testCheckProcessStatusRejectsFailureWithoutStderr(): void
+    {
+        $media = $this->getMockBuilder(AbstractGenerator::class)
+            ->onlyMethods(['configure'])
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $method = new \ReflectionMethod($media, 'checkProcessStatus');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionCode(1);
+        $method->invoke($media, 1, '', '', 'the command');
     }
 
     public function testItThrowsTheProperExceptionWhenFileExistsAndNotOverwritting(): void
