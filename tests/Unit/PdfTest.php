@@ -250,8 +250,24 @@ class PdfTest extends TestCase
             'format' => 'pdf',
         ]);
 
-        // The format option should be passed without escaping (deprecated option)
-        $this->assertStringContainsString('--format pdf', $command);
+        // The deprecated format option is escaped like every other string option
+        $this->assertStringContainsString("--format 'pdf'", $command);
+    }
+
+    /**
+     * @covers \Pontedilana\PhpWeasyPrint\Pdf::buildCommand
+     */
+    public function testBuildCommandEscapesShellMetacharactersInFormatOption(): void
+    {
+        $pdf = new PdfSpy();
+        $method = new \ReflectionMethod($pdf, 'buildCommand');
+        (\PHP_VERSION_ID < 80100) && $method->setAccessible(true);
+
+        $command = $method->invoke($pdf, \PHP_BINARY, 'input.html', 'output.pdf', [
+            'format' => 'pdf; touch /tmp/pwn; #',
+        ]);
+
+        $this->assertStringContainsString("--format 'pdf; touch /tmp/pwn; #'", $command);
     }
 
     /**

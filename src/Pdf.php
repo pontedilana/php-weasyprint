@@ -207,9 +207,6 @@ class Pdf extends AbstractGenerator
                 }
             } else {
                 switch ($key) {
-                    case 'format':
-                        $command .= ' --' . $key . ' ' . $option;
-                        break;
                     case 'dpi':
                     case 'jpeg-quality':
                     case 'resolution':
